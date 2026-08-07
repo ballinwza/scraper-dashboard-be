@@ -1,0 +1,470 @@
+basePath: /api/v1
+definitions:
+  domain.RentalEstate:
+    properties:
+      area_sqm:
+        type: number
+      bathrooms:
+        type: integer
+      bedrooms:
+        type: integer
+      created_at:
+        type: string
+      date_posted:
+        type: string
+      description:
+        type: string
+      formal_name:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      latitude:
+        type: number
+      location:
+        type: string
+      longitude:
+        type: number
+      price:
+        type: number
+      property_type:
+        type: string
+      source_url:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  handler.apiResponse:
+    properties:
+      data: {}
+      message:
+        example: Operation successful
+        type: string
+      status:
+        example: 200
+        type: integer
+    type: object
+  handler.errorResponse:
+    properties:
+      error:
+        example: Invalid request payload
+        type: string
+    type: object
+  handler.loginRequest:
+    properties:
+      password:
+        minLength: 6
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  handler.loginResponse:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+    type: object
+  handler.refreshResponse:
+    properties:
+      access_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+      refresh_token:
+        example: d3f78a9c2b4e8f110a1290bc5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f
+        type: string
+    type: object
+  handler.registerRequest:
+    properties:
+      name:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      username:
+        type: string
+    required:
+    - name
+    - password
+    - username
+    type: object
+  handler.registerResponse:
+    properties:
+      id:
+        type: string
+      message:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+      username:
+        type: string
+    type: object
+  handler.rentalEstatePaginatedResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/domain.RentalEstate'
+        type: array
+      pagination:
+        $ref: '#/definitions/handler.rentalEstatePaginationMetaResponse'
+    type: object
+  handler.rentalEstatePaginationMetaResponse:
+    properties:
+      current_page:
+        example: 1
+        type: integer
+      has_next:
+        example: true
+        type: boolean
+      has_prev:
+        example: false
+        type: boolean
+      limit:
+        example: 10
+        type: integer
+      total_items:
+        example: 100
+        type: integer
+      total_pages:
+        example: 10
+        type: integer
+    type: object
+  handler.rentalEstateResponse:
+    properties:
+      area_sqm:
+        type: number
+      bathrooms:
+        type: integer
+      bedrooms:
+        type: integer
+      created_at:
+        type: string
+      date_posted:
+        type: string
+      description:
+        type: string
+      formal_name:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      latitude:
+        type: number
+      location:
+        type: string
+      longitude:
+        type: number
+      price:
+        type: number
+      property_type:
+        type: string
+      source_url:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  handler.triggerScraperRentalEstateRequest:
+    properties:
+      max_page:
+        example: 1
+        type: integer
+      start_page:
+        example: 1
+        type: integer
+      target_url:
+        example: https://www.dotproperty.co.th/en/condos-for-rent/bangkok
+        type: string
+    required:
+    - target_url
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API Service สำหรับจัดการข้อมูล Scraping และแสดงผลบน Dashboard
+  title: Scraper & Data Aggregator API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login with username, password
+      parameters:
+      - description: Login Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.loginRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handler.loginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Loging into system
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      responses: {}
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Receive refresh_token from cookie to refreshing refreshToken in
+        data
+      parameters:
+      - description: 'Cookie: refresh_token=...'
+        in: header
+        name: refresh_token
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Access Token succesfully
+          headers:
+            Set-Cookie:
+              description: refresh_token=...; Path=/; HttpOnly; Secure; SameSite=Strict
+              type: string
+          schema:
+            $ref: '#/definitions/handler.refreshResponse'
+        "400":
+          description: Bad input request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "401":
+          description: Cookie missing or Token Invalid
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - CookieAuth: []
+      summary: Refresh all token of user
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with username, password, and name
+      parameters:
+      - description: Register Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.registerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handler.registerResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a new user
+      tags:
+      - Auth
+  /rental/estate/{id}:
+    delete:
+      parameters:
+      - description: Estate ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: ลบรายการอสังหาริมทรัพย์ที่ไม่อัปเดตหรือซ้ำซ้อน
+      tags:
+      - Rental Estates
+    get:
+      parameters:
+      - description: Estate ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.rentalEstateResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: ดึงรายละเอียดเชิงลึกของอสังหาริมทรัพย์รายชิ้น
+      tags:
+      - Rental Estates
+  /rental/estates:
+    get:
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Limit per page
+        in: query
+        name: limit
+        type: integer
+      - description: Search keyword
+        in: query
+        name: search
+        type: string
+      - description: Minimum price
+        in: query
+        name: min_price
+        type: number
+      - description: Maximum price
+        in: query
+        name: max_price
+        type: number
+      - description: Sort field
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order (asc/desc)
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.rentalEstatePaginatedResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: ดึงรายการข้อมูลอสังหาฯ (Pagination, Filtering, Sorting)
+      tags:
+      - Rental Estates
+  /rental/estates/export:
+    get:
+      parameters:
+      - description: Search keyword
+        in: query
+        name: search
+        type: string
+      - description: Minimum price
+        in: query
+        name: min_price
+        type: number
+      - description: Maximum price
+        in: query
+        name: max_price
+        type: number
+      produces:
+      - text/csv
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: ส่งออกข้อมูลอสังหาฯ ที่เลือกหรือค้นหาออกมาเป็นไฟล์ CSV
+      tags:
+      - Rental Estates
+  /scraper/rental-estate:
+    post:
+      consumes:
+      - application/json
+      description: Scrapping Manualy by Target URL
+      parameters:
+      - description: Target URL Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.triggerScraperRentalEstateRequest'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Scraper job started successfully
+          schema:
+            $ref: '#/definitions/handler.apiResponse'
+        "400":
+          description: Invalid request payload
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "422":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Failed to start scraper job
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Trigger Scraper Job
+      tags:
+      - Scraper Controls
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+  CookieAuth:
+    in: cookie
+    name: refresh_token
+    type: apiKey
+swagger: "2.0"

@@ -12,7 +12,7 @@ steps:
       - '-t'
       - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE}:${_ENVIRONMENT}-latest'
       - '--build-arg'
-      - 'APP_ENV=${_ENVIRONMENT}' # ส่งค่า Environment เข้าไปใน Dockerfile หากต้องใช้ตอน Build
+      - 'ENV=${_ENVIRONMENT}' # ส่งค่า Environment เข้าไปใน Dockerfile หากต้องใช้ตอน Build
       - '.'
 
   # ------------------------------------------------------------------
@@ -45,6 +45,7 @@ steps:
       - '--platform=managed'
       - '--port=8080'                 
       - '--allow-unauthenticated'
+      - '--set-secrets=/app/.env=db-password-scraper-dashboard-be-prod:latest'
 
 # บันทึกประวัติ Images ที่สร้างขึ้นใน Cloud Build Artifacts
 images:

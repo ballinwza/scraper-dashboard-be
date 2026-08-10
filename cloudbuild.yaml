@@ -6,6 +6,7 @@ steps:
     id: 'Build Docker Image'
     args:
       - 'build'
+      - '--target=runner'
       - '-t'
       - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE}:${SHORT_SHA}'
       - '-t'
@@ -42,6 +43,8 @@ steps:
       - '--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE}:${SHORT_SHA}'
       - '--region=${_REGION}'
       - '--platform=managed'
+      - '--port=8080'                 
+      - '--allow-unauthenticated'
 
 # บันทึกประวัติ Images ที่สร้างขึ้นใน Cloud Build Artifacts
 images:

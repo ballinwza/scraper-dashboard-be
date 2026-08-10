@@ -25,3 +25,9 @@ docker-run:
 
 docker-clear:
 	docker run --rm -it scraper-dashboard-be /bin/sh
+
+compose-up:
+	docker compose up --build -d
+
+compose-down:
+	docker compose down -v

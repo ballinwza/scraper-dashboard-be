@@ -22,7 +22,7 @@ type Config struct {
 
 func LoadConfig(path string) (config Config, err error) {
 	viper.AddConfigPath(path)
-	viper.SetConfigName(".env")
+	viper.SetConfigFile(path + "/.env")
 	viper.SetConfigType("env")
 
 	viper.SetDefault("PORT", "8080")
@@ -36,6 +36,8 @@ func LoadConfig(path string) (config Config, err error) {
 		log.Printf("⚠️ Warning: .env file not found, fallback to system environment variables: %v", err)
 	}
 
+	bindEnvKeys()
+
 	err = viper.Unmarshal(&config)
 	if err != nil {
 		log.Fatalf("❌ Unable to decode configuration into struct: %v", err)
@@ -43,4 +45,22 @@ func LoadConfig(path string) (config Config, err error) {
 	}
 
 	return config, nil
+}
+
+func bindEnvKeys() {
+	keys := []string{
+		"PORT",
+		"ENV",
+		"MONGO_URI",
+		"MONGO_DB_NAME",
+		"REDIS_ADDR",
+		"REDIS_PASSWORD",
+		"JWT_ACCESS_SECRET",
+		"JWT_ACCESS_EXPIRATION_MINS",
+		"JWT_REFRESH_SECRET",
+		"JWT_REFRESH_EXPIRATION_MINS",
+	}
+	for _, key := range keys {
+		_ = viper.BindEnv(key)
+	}
 }

@@ -8,9 +8,9 @@ steps:
       - 'build'
       - '--target=runner'
       - '-t'
-      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE}:${SHORT_SHA}'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/${_SERVICE}:${SHORT_SHA}'
       - '-t'
-      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE}:${_ENVIRONMENT}-latest'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/${_SERVICE}:${_ENVIRONMENT}-latest'
       - '--build-arg'
       - 'ENV=${_ENVIRONMENT}' # ส่งค่า Environment เข้าไปใน Dockerfile หากต้องใช้ตอน Build
       - '.'
@@ -22,13 +22,13 @@ steps:
     id: 'Push Commit SHA Tag'
     args:
       - 'push'
-      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE}:${SHORT_SHA}'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/${_SERVICE}:${SHORT_SHA}'
 
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Push Environment Latest Tag'
     args:
       - 'push'
-      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE}:${_ENVIRONMENT}-latest'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/${_SERVICE}:${_ENVIRONMENT}-latest'
 
   # ------------------------------------------------------------------
   # Step 3: Deploy ไปยัง Cloud Run
@@ -40,17 +40,17 @@ steps:
       - 'run'
       - 'deploy'
       - '${_SERVICE}'
-      - '--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE}:${SHORT_SHA}'
+      - '--image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/${_SERVICE}:${SHORT_SHA}'
       - '--region=${_REGION}'
       - '--platform=managed'
       - '--port=8080'                 
       - '--allow-unauthenticated'
-      - '--set-secrets=/app/.env=db-password-scraper-dashboard-be-prod:latest'
+      - '--set-secrets=app/.env=db-password-scraper-dashboard-be-prod:latest'
 
 # บันทึกประวัติ Images ที่สร้างขึ้นใน Cloud Build Artifacts
 images:
-  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE}:${SHORT_SHA}'
-  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE}:${_ENVIRONMENT}-latest'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/${_SERVICE}:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/${_SERVICE}:${_ENVIRONMENT}-latest'
 
 # กำหนดระยะเวลา Timeout ของ Pipeline
 timeout: '1200s'

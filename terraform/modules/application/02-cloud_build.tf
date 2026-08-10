@@ -16,7 +16,7 @@ resource "google_cloudbuild_trigger" "filename_trigger" {
   filename = "cloudbuild.yaml"
 
   substitutions = {
-    _REGION      = var.region
+    _REGION      = var.region 
     _ENVIRONMENT = var.environment
     _SERVICE     = "${var.service_name}-${var.environment}"
     _REPO_NAME   = google_artifact_registry_repository.repo.name

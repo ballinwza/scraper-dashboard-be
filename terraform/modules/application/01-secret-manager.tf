@@ -17,12 +17,18 @@ resource "google_secret_manager_secret_version" "db_password_version" {
   secret_data = var.db_password_value # ค่ารหัสผ่านจริงที่รับมาจาก variable
 }
 
+resource "google_secret_manager_secret_iam_member" "sa_accessor" {
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.db_password.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:758337397665-compute@developer.gserviceaccount.com"
+}
+
 # 3. กำหนดสิทธิ์ IAM ให้ Service Account ของ Cloud Run สามารถอ่าน Secret นี้ได้
 resource "google_secret_manager_secret_iam_member" "cloud_run_secret_access" {
   project   = var.project_id
   secret_id = google_secret_manager_secret.db_password.secret_id
   role      = "roles/secretmanager.secretAccessor"
 
-  # ใช้ Service Account ของ Cloud Run (หรือใช้ตัวเดียวกับ Cloud Build ตามที่ออกแบบไว้)
   member    = "serviceAccount:${google_service_account.cloud_build_sa.email}"
 }

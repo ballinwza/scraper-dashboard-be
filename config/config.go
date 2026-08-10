@@ -22,7 +22,9 @@ type Config struct {
 
 func LoadConfig(path string) (config Config, err error) {
 	viper.AddConfigPath(path)
-	viper.SetConfigFile(path + "/.env")
+	viper.AddConfigPath("/secrets")
+	viper.AddConfigPath(".")
+	viper.SetConfigName(".env")
 	viper.SetConfigType("env")
 
 	viper.SetDefault("PORT", "8080")

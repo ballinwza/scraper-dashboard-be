@@ -45,7 +45,7 @@ steps:
       - '--platform=managed'
       - '--port=8080'                 
       - '--allow-unauthenticated'
-      - '--set-secrets=app/.env=db-password-scraper-dashboard-be-prod:latest'
+      - '--set-secrets=/secrets/.env=db-password-scraper-dashboard-be-prod:latest'
 
 # บันทึกประวัติ Images ที่สร้างขึ้นใน Cloud Build Artifacts
 images:

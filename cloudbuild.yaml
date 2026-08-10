@@ -1,0 +1,57 @@
+steps:
+  # ------------------------------------------------------------------
+  # Step 1: Build Docker Image
+  # ------------------------------------------------------------------
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Build Docker Image'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE}:${SHORT_SHA}'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE}:${_ENVIRONMENT}-latest'
+      - '--build-arg'
+      - 'APP_ENV=${_ENVIRONMENT}' # ส่งค่า Environment เข้าไปใน Dockerfile หากต้องใช้ตอน Build
+      - '.'
+
+  # ------------------------------------------------------------------
+  # Step 2: Push Docker Images ไปยัง Artifact Registry
+  # ------------------------------------------------------------------
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Push Commit SHA Tag'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE}:${SHORT_SHA}'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Push Environment Latest Tag'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE}:${_ENVIRONMENT}-latest'
+
+  # ------------------------------------------------------------------
+  # Step 3: Deploy ไปยัง Cloud Run
+  # ------------------------------------------------------------------
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'Deploy to Cloud Run'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_SERVICE}'
+      - '--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE}:${SHORT_SHA}'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+
+# บันทึกประวัติ Images ที่สร้างขึ้นใน Cloud Build Artifacts
+images:
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE}:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE}:${_ENVIRONMENT}-latest'
+
+# กำหนดระยะเวลา Timeout ของ Pipeline
+timeout: '1200s'
+
+# กำหนด Machine Type สำหรับรัน Build ( e2-highcpu-8 ช่วยให้ Build เร็วขึ้น)
+options:
+  machineType: 'E2_HIGHCPU_8'
+  logging: 'CLOUD_LOGGING_ONLY'

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "github.com/ballinwza/scraper-dashboard-be/api/proto/v1;grpc_api";
+
+package chat.v1;
+
+service ChatGRPC {
+  rpc Query (ChatRequest) returns (ChatResponse) {}
+}
+
+message ChatRequest {
+  string question = 1; // เช่น "สรุปเอกสาร"
+}
+
+message ChatResponse {
+  string message = 1;  // ข้อความแจ้งสถานะการทำงาน
+}

@@ -13,6 +13,7 @@ func SetupRouter(
 	scraperHandler *handler.ScraperHandler,
 	rentalEstateHandler *handler.RentalEstateHandler,
 	authHandler *handler.UserHandler,
+	ragHandler *handler.RagHandler,
 ) *gin.Engine {
 	r := gin.Default()
 
@@ -32,7 +33,7 @@ func SetupRouter(
 		}
 
 		scraperGroup := api.Group("/scraper")
-		// scraperGroup.Use(middleware.JWTAuthMiddleware(jwtSecret))
+		scraperGroup.Use(middleware.JWTAuthMiddleware(jwtSecret))
 		{
 			scraperGroup.POST("/rental-estate", scraperHandler.ScraperRentalEstate)
 		}
@@ -44,6 +45,12 @@ func SetupRouter(
 			rentalEstateGroup.GET("/estates/export", rentalEstateHandler.RentalEstateExportCSV)
 			rentalEstateGroup.GET("/estate/:id", rentalEstateHandler.RentalEstateById)
 			rentalEstateGroup.DELETE("/estate/:id", rentalEstateHandler.DeleteRentalEstateById)
+		}
+
+		ragGroup := api.Group("/rag")
+		ragGroup.Use(middleware.JWTAuthMiddleware(jwtSecret))
+		{
+			ragGroup.POST("/qna", ragHandler.AskQuestion)
 		}
 
 	}

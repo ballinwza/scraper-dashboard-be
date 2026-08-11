@@ -18,6 +18,7 @@ type Config struct {
 	JwtAccessExpirationMins  int    `mapstructure:"JWT_ACCESS_EXPIRATION_MINS"`
 	JwtRefreshSecret         string `mapstructure:"JWT_REFRESH_SECRET"`
 	JwtRefreshExpirationMins int    `mapstructure:"JWT_REFRESH_EXPIRATION_MINS"`
+	AiEstateRagUri           string `mapstructure:"AI_ESTATE_RAG_URI"`
 }
 
 func LoadConfig(path string) (config Config, err error) {
@@ -31,6 +32,7 @@ func LoadConfig(path string) (config Config, err error) {
 	viper.SetDefault("ENV", "development")
 	viper.SetDefault("JWT_ACCESS_EXPIRATION_MINS", 15)
 	viper.SetDefault("JWT_REFRESH_EXPIRATION_MINS", 10080)
+	viper.SetDefault("AI_ESTATE_RAG_URI", "localhost:50052")
 
 	viper.AutomaticEnv()
 
@@ -61,6 +63,7 @@ func bindEnvKeys() {
 		"JWT_ACCESS_EXPIRATION_MINS",
 		"JWT_REFRESH_SECRET",
 		"JWT_REFRESH_EXPIRATION_MINS",
+		"AI_ESTATE_RAG_URI",
 	}
 	for _, key := range keys {
 		_ = viper.BindEnv(key)

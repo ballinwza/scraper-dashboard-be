@@ -1,5 +1,7 @@
 # Go (Gin) Backend Service
 
+[https://scraper-dashboard-be-prod-758337397665.asia-southeast1.run.app](https://scraper-dashboard-be-prod-758337397665.asia-southeast1.run.app)
+
 ## Code Structure & Clean Architecture
 ```
 github.com/ballinwza/scraper-dashboard-be/
@@ -19,6 +21,10 @@ github.com/ballinwza/scraper-dashboard-be/
 │   │   │   ├── handler/
 │   │   │   ├── middleware/          # Auth JWT, CORS, Logging
 │   │   │   └── router.go            # Route registrations
+│   │   ├── grpc/         
+│   │   │   ├── handler/             # Implements gRPC Generated Interfaces
+│   │   │   ├── interceptor/         # Middleware สำหรับ gRPC (Auth, Logging, Recovery)
+│   │   │   └── server.go            # gRPC Server Initialization & Registration
 │   │   └── ws/                      # WebSockets for Real-time Scraper Logs
 │   │
 │   └── repository/                  # Infrastructure Layer (Adapters for Outbound Calls)

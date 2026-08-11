@@ -2,10 +2,13 @@ package external_grpc
 
 import (
 	"context"
+	"crypto/x509"
 	"fmt"
 
 	grpc_api "github.com/ballinwza/scraper-dashboard-be/internal/delivery/grpc/api"
+	"github.com/ballinwza/scraper-dashboard-be/pkg/helper"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
@@ -17,19 +20,31 @@ type aiEstateRagRepository struct {
 	client grpc_api.ChatGRPCClient
 }
 
-// NewAiEstateRagRepository สร้าง gRPC Client Connection ไปยัง port 50052
 func NewAiEstateRagRepository(targetAddr string) (IAiEstateRagRepository, func(), error) {
-	if targetAddr == "" {
-		targetAddr = "localhost:50052" // หรือ "grpc-service:50052" สำหรับ Docker
+	var transportCreds credentials.TransportCredentials
+
+	// เช็คว่าเป็น Local (localhost / 127.0.0.1) หรือเป็น Production (Cloud Run)
+	if helper.IsLocalIP(targetAddr) {
+		// Local: ใช้ insecure credentials
+		transportCreds = insecure.NewCredentials()
+	} else {
+		// Production (Cloud Run): บังคับใช้ TLS/SSL (Port 443)
+		systemRoots, err := x509.SystemCertPool()
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to read system root certs: %w", err)
+		}
+		transportCreds = credentials.NewClientTLSFromCert(systemRoots, "")
 	}
 
-	// สร้าง Connection ไปยัง gRPC Target
-	conn, err := grpc.NewClient(targetAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// สร้าง Connection
+	conn, err := grpc.NewClient(
+		targetAddr,
+		grpc.WithTransportCredentials(transportCreds),
+	)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to connect to external gRPC on %s: %w", targetAddr, err)
+		return nil, nil, fmt.Errorf("failed to connect to gRPC on %s: %w", targetAddr, err)
 	}
 
-	// ฟังก์ชัน Cleanup สำหรับสั่ง Close Connection เมื่อแอปปิด
 	cleanup := func() {
 		conn.Close()
 	}

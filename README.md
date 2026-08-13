@@ -1,7 +1,7 @@
 # Go (Gin) Backend Service
 
 [https://scraper-dashboard-be-prod-758337397665.asia-southeast1.run.app](https://scraper-dashboard-be-prod-758337397665.asia-southeast1.run.app)
-
+[Frontend Service](https://scraper-dashboard-fe-prod-758337397665.asia-southeast1.run.app)
 ## Code Structure & Clean Architecture
 ```
 github.com/ballinwza/scraper-dashboard-be/

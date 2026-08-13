@@ -13,7 +13,10 @@ const collectionName = "user"
 type UserUsecase interface {
 	Register(ctx context.Context, username, password, name string) (*domain.User, error)
 	Login(ctx context.Context, username, password, userAgent, clientIp string) (*string, *string, error)
-	Refresh(ctx context.Context, refreshToken string) (*string, *string, error)
+	Refresh(ctx context.Context, username, refreshToken string) (*string, *string, error)
+	Logout(ctx context.Context, username, refreshToken string) error
+	EnsureIndexes(ctx context.Context) error
+	GetUserByUsername(ctx context.Context, username string) (*domain.User, error)
 }
 
 type userUsecase struct {

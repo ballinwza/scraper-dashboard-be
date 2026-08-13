@@ -201,6 +201,15 @@ definitions:
     required:
     - target_url
     type: object
+  handler.userResponse:
+    properties:
+      name:
+        type: string
+      role:
+        type: string
+      username:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -208,6 +217,31 @@ info:
   title: Scraper & Data Aggregator API
   version: "1.0"
 paths:
+  /api/v1/auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout user session
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.apiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: User Logout
+      tags:
+      - Auth
   /auth/login:
     post:
       consumes:
@@ -236,9 +270,6 @@ paths:
       summary: Loging into system
       tags:
       - Auth
-  /auth/logout:
-    post:
-      responses: {}
   /auth/refresh:
     post:
       consumes:
@@ -497,6 +528,31 @@ paths:
       summary: Trigger Scraper Job
       tags:
       - Scraper Controls
+  /users:
+    get:
+      description: Get user details by username after authenticationo scuccess
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.userResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get User by Username
+      tags:
+      - User
 securityDefinitions:
   BearerAuth:
     in: header

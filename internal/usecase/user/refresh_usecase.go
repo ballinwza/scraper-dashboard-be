@@ -6,36 +6,22 @@ import (
 
 	"github.com/ballinwza/scraper-dashboard-be/internal/domain"
 	"github.com/ballinwza/scraper-dashboard-be/pkg/helper"
-	"github.com/golang-jwt/jwt/v5"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func (u *userUsecase) Refresh(ctx context.Context, refreshToken string) (*string, *string, error) {
-	claims := &domain.RefreshClaims{}
-	token, err := jwt.ParseWithClaims(refreshToken, claims, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, domain.ErrInvalidToken
-		}
-		return []byte(u.cfg.JwtRefreshSecret), nil // ใช้ refreshSecret
-	})
-	if err != nil || !token.Valid {
-		return nil, nil, domain.ErrInvalidToken
-	}
-
-	// Check User
-	tokenHash := helper.HashTokenSHA256(refreshToken)
+func (u *userUsecase) Refresh(ctx context.Context, username, refreshHashedToken string) (*string, *string, error) {
 	now := helper.NowUTC()
 	filter := bson.M{
-		"username": claims.Username,
+		"username": username,
 		"refresh_tokens": bson.M{
 			"$elemMatch": bson.M{
-				"token_hash": tokenHash,
-				"expires_at": bson.M{"$gt": now}, // $gt = Greater Than ( expires_at ต้องมากกว่าเวลาปัจจุบัน)
+				"token_hash": refreshHashedToken,
+				"expires_at": bson.M{"$gt": now},
 			},
 		},
 	}
 
-	newRefreshToken, err := u.generateRefreshToken(u.cfg.JwtRefreshSecret, claims.Username, u.cfg.JwtRefreshExpirationMins)
+	newRefreshToken, err := u.generateRefreshToken(u.cfg.JwtRefreshSecret, username, u.cfg.JwtRefreshExpirationMins)
 	if err != nil {
 		return nil, nil, domain.ErrInvalidToken
 	}
@@ -45,6 +31,7 @@ func (u *userUsecase) Refresh(ctx context.Context, refreshToken string) (*string
 		"$set": bson.M{
 			"refresh_tokens.$.token_hash": newRefreshTokenHashed,
 			"refresh_tokens.$.expires_at": newExpireAt,
+			"updated_at":                  now,
 		},
 	}
 
@@ -53,7 +40,6 @@ func (u *userUsecase) Refresh(ctx context.Context, refreshToken string) (*string
 		return nil, nil, domain.ErrInvalidCredentials
 	}
 
-	// Generate new AccessToken & Refresh Token
 	newAccessToken, err := u.generateAccessToken(u.cfg.JwtAccessSecret, user.Username, "user", u.cfg.JwtAccessExpirationMins)
 	if err != nil {
 		return nil, nil, domain.ErrInvalidToken

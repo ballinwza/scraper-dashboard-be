@@ -82,6 +82,11 @@ func main() {
 	authUsecase := usecase_user.NewAuthUsecase(mongoUserRepo, cfg)
 	ragUsecase := usecase_rag.NewRagUsecase(grpcConn)
 
+	// Createing index
+	if err := authUsecase.EnsureIndexes(ctx); err != nil {
+		log.Fatalf("Failed to ensure indexes: %v", err)
+	}
+
 	// Handlers
 	scraperHandler := handler.NewScraperHandler(rentalEstateUsecase)
 	rentalHandler := handler.NewRentalEstateHandler(rentalEstateUsecase)
@@ -112,7 +117,7 @@ func main() {
 	// # Initialize & Start HTTP Router (Main Thread)
 	// ==========================================
 	r := http.SetupRouter(
-		cfg.JwtAccessSecret,
+		cfg,
 		scraperHandler,
 		rentalHandler,
 		authHandler,

@@ -3,10 +3,10 @@ package usecase_user
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/ballinwza/scraper-dashboard-be/internal/domain"
 	"github.com/ballinwza/scraper-dashboard-be/pkg/helper"
+	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -17,8 +17,6 @@ func (u *userUsecase) Register(
 	filter := domain.User{
 		Username: username,
 	}
-
-	fmt.Println("filter : ", filter)
 
 	existingUser, _ := u.mongodbRepo.FindOneByFilter(ctx, collectionName, filter)
 	if existingUser != nil {
@@ -62,6 +60,9 @@ func (u *userUsecase) Register(
 	}
 
 	if err := u.mongodbRepo.Create(ctx, collectionName, user); err != nil {
+		if mongo.IsDuplicateKeyError(err) {
+			return nil, errors.New("Username already registered")
+		}
 		return nil, err
 	}
 

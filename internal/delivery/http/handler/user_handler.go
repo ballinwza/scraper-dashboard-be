@@ -15,7 +15,6 @@ type UserHandler struct {
 }
 
 func NewUserHandler(authUsecase usecase_user.UserUsecase, cfg config.Config) *UserHandler {
-
 	return &UserHandler{
 		authUsecase: authUsecase,
 		cfg:         cfg,
@@ -34,7 +33,7 @@ func NewUserHandler(authUsecase usecase_user.UserUsecase, cfg config.Config) *Us
 // @Router /auth/register [post]
 func (h *UserHandler) Register(c *gin.Context) {
 	var req registerRequest
-	var validator = validator.New()
+	validator := validator.New()
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -77,7 +76,7 @@ func (h *UserHandler) Register(c *gin.Context) {
 // @Router /auth/login [post]
 func (h *UserHandler) Login(c *gin.Context) {
 	var req loginRequest
-	var validator = validator.New()
+	validator := validator.New()
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -124,21 +123,32 @@ func (h *UserHandler) Login(c *gin.Context) {
 // @Header       200            {string}  Set-Cookie       "refresh_token=...; Path=/; HttpOnly; Secure; SameSite=Strict"
 // @Router /auth/refresh [post]
 func (h *UserHandler) Refresh(c *gin.Context) {
-	// var req RefreshClaimsRequest
-	// if err := c.ShouldBindJSON(&req); err != nil {
-	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
-	// 	return
-	// }
+	usernameVal, exists := c.Get(config.USERNAME_KEY)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	username, ok := usernameVal.(string)
+	if !ok || username == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user session"})
+		return
+	}
 
-	refreshToken, err := c.Cookie("refresh_token")
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "refresh token cookie missing"})
+	refreshHashTokenVal, exists := c.Get(config.REFRESH_HASH_TOKEN_KEY)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	refreshHashToken, ok := refreshHashTokenVal.(string)
+	if !ok || username == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user session"})
 		return
 	}
 
 	access, refresh, err := h.authUsecase.Refresh(
 		c.Request.Context(),
-		refreshToken,
+		username,
+		refreshHashToken,
 	)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
@@ -153,5 +163,80 @@ func (h *UserHandler) Refresh(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-// @Router /auth/logout [post]
-func (h *UserHandler) Logout(c *gin.Context) {}
+// Logout
+// @Summary      User Logout
+// @Description  Logout user session
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  apiResponse
+// @Failure      400  {object}  errorResponse
+// @Failure      500  {object}  errorResponse
+// @Router       /api/v1/auth/logout [post]
+func (h *UserHandler) Logout(c *gin.Context) {
+	usernameVal, exists := c.Get(config.USERNAME_KEY)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	username, ok := usernameVal.(string)
+	if !ok || username == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user session"})
+		return
+	}
+
+	refreshHashTokenVal, exists := c.Get(config.REFRESH_HASH_TOKEN_KEY)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	refreshHashToken, ok := refreshHashTokenVal.(string)
+	if !ok || username == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user session"})
+		return
+	}
+
+	err := h.authUsecase.Logout(c.Request.Context(), username, refreshHashToken)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "logged out successfully"})
+}
+
+// GetUser
+// @Summary      Get User by Username
+// @Description  Get user details by username after authenticationo scuccess
+// @Tags         User
+// @Produce      json
+// @Success      200       {object}  userResponse
+// @Failure      400       {object}  errorResponse
+// @Failure      404       {object}  errorResponse
+// @Failure      500       {object}  errorResponse
+// @Router       /users [get]
+func (h *UserHandler) GetUser(c *gin.Context) {
+	usernameVal, exists := c.Get(config.USERNAME_KEY)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	username, ok := usernameVal.(string)
+	if !ok || username == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user session"})
+		return
+	}
+
+	user, err := h.authUsecase.GetUserByUsername(c.Request.Context(), username)
+	if err != nil {
+		if err.Error() == "user not found" {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user"})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}

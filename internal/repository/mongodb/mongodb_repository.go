@@ -16,6 +16,7 @@ import (
 )
 
 type IMongoDBGenericRepository[T any] interface {
+	CreateIndex(ctx context.Context, collectionName string, indexModel mongo.IndexModel) (string, error)
 	Create(ctx context.Context, collectionName string, entity *T) error
 	CreateMany(ctx context.Context, collectionName string, entities []T) error
 	GetByID(ctx context.Context, collectionName string, id string) (*T, error)
@@ -23,6 +24,7 @@ type IMongoDBGenericRepository[T any] interface {
 	FindOneByFilter(ctx context.Context, collectionName string, filter interface{}) (*T, error)
 	FindOneAndUpdate(ctx context.Context, collectionName string, filter interface{}, data interface{}) (*T, error)
 	Update(ctx context.Context, collectionName string, id string, updateData interface{}) error
+	UpdateOne(ctx context.Context, collectionName string, filter interface{}, update interface{}) error
 	DeleteById(ctx context.Context, collectionName string, id string) error
 	BulkUpsert(ctx context.Context, collectionName string, models []domain.BulkUpsert) error
 	FindPaginated(ctx context.Context, collectionName string, filter interface{}, findOptions *options.FindOptions) ([]T, int64, error)
@@ -37,6 +39,10 @@ func NewMongoGenericRepository[T any](db *mongo.Database) IMongoDBGenericReposit
 	return &mongoGenericRepository[T]{
 		db: db,
 	}
+}
+
+func (r *mongoGenericRepository[T]) CreateIndex(ctx context.Context, collectionName string, indexModel mongo.IndexModel) (string, error) {
+	return r.db.Collection(collectionName).Indexes().CreateOne(ctx, indexModel)
 }
 
 func (r *mongoGenericRepository[T]) Create(ctx context.Context, collectionName string, entity *T) error {
@@ -222,6 +228,12 @@ func (r *mongoGenericRepository[T]) Update(ctx context.Context, collectionName s
 
 	logger.Info("Successfully updated document in collection: " + collectionName)
 	return nil
+}
+
+func (r *mongoGenericRepository[T]) UpdateOne(ctx context.Context, collectionName string, filter interface{}, update interface{}) error {
+	coll := r.db.Collection(collectionName)
+	_, err := coll.UpdateOne(ctx, filter, update)
+	return err
 }
 
 func (r *mongoGenericRepository[T]) DeleteById(ctx context.Context, collectionName string, id string) error {

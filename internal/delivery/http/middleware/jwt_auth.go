@@ -1,10 +1,12 @@
 package middleware
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strings"
 
+	"github.com/ballinwza/scraper-dashboard-be/config"
 	"github.com/ballinwza/scraper-dashboard-be/internal/delivery/http/handler"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -12,6 +14,11 @@ import (
 
 func JWTAuthMiddleware(accessSecret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if c.Request.Method == http.MethodOptions {
+			c.Next()
+			return
+		}
+
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{
@@ -49,27 +56,15 @@ func JWTAuthMiddleware(accessSecret string) gin.HandlerFunc {
 			return
 		}
 
-		// บันทึก Claims ไว้ใน Context สำหรับ Handler ถัดไปนำไปใช้งาน
-		if claims, ok := token.Claims.(handler.AccessClaimsRequest); ok {
-			c.Set("username", claims.Username)
-			c.Set("role", claims.Role)
+		if customClaims, ok := token.Claims.(*handler.AccessClaimsRequest); ok {
+			c.Set(config.USERNAME_KEY, customClaims.Username)
+			c.Set("role", customClaims.Role)
+
+			// บันทึกลง c.Request.Context() (สำหรับ Usecase ดึงจาก ctx.Value)
+			ctx := context.WithValue(c.Request.Context(), config.USERNAME_KEY, customClaims.Username)
+			// ctx = context.WithValue(ctx, RoleKey, customClaims.Role)
+			c.Request = c.Request.WithContext(ctx)
 		}
-
-		// บันทึกใน context
-		// type contextKey string
-		// const UserIDKey contextKey = "username"
-
-		// if customClaims, ok := token.Claims.(*handler.AccessClaimsRequest); ok {
-		// 	// แปะค่าลง stdlib context.Context
-		// 	ctx := context.WithValue(c.Request.Context(), UserIDKey, customClaims.Username)
-		// 	c.Request = c.Request.WithContext(ctx)
-		// }
-
-		// วิธีเรียกใช้ใน usecase โดยตรง
-		// userID, ok := ctx.Value(UserIDKey).(string)
-		//     if !ok {
-		//         return errors.New("unauthorized")
-		//     }
 
 		c.Next()
 	}

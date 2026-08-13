@@ -479,6 +479,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
+                    "406": {
+                        "description": "Avaliable for admin only",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
                     "422": {
                         "description": "Validation error",
                         "schema": {

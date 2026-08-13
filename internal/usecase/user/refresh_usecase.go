@@ -40,7 +40,7 @@ func (u *userUsecase) Refresh(ctx context.Context, username, refreshHashedToken 
 		return nil, nil, domain.ErrInvalidCredentials
 	}
 
-	newAccessToken, err := u.generateAccessToken(u.cfg.JwtAccessSecret, user.Username, "user", u.cfg.JwtAccessExpirationMins)
+	newAccessToken, err := u.generateAccessToken(u.cfg.JwtAccessSecret, user.Username, user.Role, u.cfg.JwtAccessExpirationMins)
 	if err != nil {
 		return nil, nil, domain.ErrInvalidToken
 	}

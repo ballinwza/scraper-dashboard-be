@@ -2,6 +2,9 @@
 
 [https://scraper-dashboard-be-prod-758337397665.asia-southeast1.run.app](https://scraper-dashboard-be-prod-758337397665.asia-southeast1.run.app)
 [Frontend Service](https://scraper-dashboard-fe-prod-758337397665.asia-southeast1.run.app)
+
+(AI Estate Rag)[https://github.com/ballinwza/ai-estate-rag]
+* HTTP/2 gRPC ```ai-estate-rag-758337397665.asia-southeast1.run.app```
 ## Code Structure & Clean Architecture
 ```
 github.com/ballinwza/scraper-dashboard-be/

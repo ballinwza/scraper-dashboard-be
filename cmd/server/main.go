@@ -94,26 +94,6 @@ func main() {
 	ragHandler := handler.NewRagHandler(ragUsecase, cfg)
 
 	// ==========================================
-	// ✨ Start gRPC Server (Non-blocking via Goroutine)
-	// ==========================================
-	// TODO: เก็บไว้เป็นตัวอย่าง GRPC
-	// go func() {
-	// 	grpcPort := ":50051" // หรือดึงมาจาก config เช่น cfg.GRPCPort
-	// 	lis, err := net.Listen("tcp", grpcPort)
-	// 	if err != nil {
-	// 		logger.Fatal("Failed to listen for gRPC", zap.Error(err))
-	// 	}
-
-	// 	// สร้าง gRPC Server (นำ Usecase ไปใช้ใน gRPC Handler ได้ตามต้องการ)
-	// 	grpcServer := appGrpc.NewGRPCServer(ragUsecase)
-
-	// 	log.Printf("📡 gRPC Server running on port %s", grpcPort)
-	// 	if err := grpcServer.Serve(lis); err != nil {
-	// 		logger.Fatal("Failed to serve gRPC", zap.Error(err))
-	// 	}
-	// }()
-
-	// ==========================================
 	// # Initialize & Start HTTP Router (Main Thread)
 	// ==========================================
 	r := http.SetupRouter(

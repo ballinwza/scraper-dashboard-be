@@ -32,6 +32,7 @@ type refreshResponse struct {
 }
 
 type AccessClaimsRequest struct {
+	UserId   string `json:"user_id"`
 	Username string `json:"username"`
 	Role     string `json:"role"`
 	jwt.RegisteredClaims

@@ -59,6 +59,7 @@ func JWTAuthMiddleware(accessSecret string) gin.HandlerFunc {
 		if customClaims, ok := token.Claims.(*handler.AccessClaimsRequest); ok {
 			c.Set(config.USERNAME_KEY, customClaims.Username)
 			c.Set("role", customClaims.Role)
+			c.Set(config.USER_ID_KEY, customClaims.UserId)
 
 			// บันทึกลง c.Request.Context() (สำหรับ Usecase ดึงจาก ctx.Value)
 			ctx := context.WithValue(c.Request.Context(), config.USERNAME_KEY, customClaims.Username)

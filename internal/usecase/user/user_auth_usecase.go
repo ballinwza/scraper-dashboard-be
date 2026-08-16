@@ -7,8 +7,9 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func (u *userUsecase) generateAccessToken(accessSecret, username, role string, expireTimeMins int) (string, error) {
+func (u *userUsecase) generateAccessToken(accessSecret, userId, username, role string, expireTimeMins int) (string, error) {
 	claims := domain.JWTAccessClaims{
+		UserId:   userId,
 		Username: username,
 		Role:     role,
 		RegisteredClaims: jwt.RegisteredClaims{

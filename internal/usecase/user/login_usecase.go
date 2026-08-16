@@ -61,7 +61,7 @@ func (u *userUsecase) Login(ctx context.Context, username, password, userAgent, 
 		return nil, nil, domain.ErrInvalidCredentials
 	}
 
-	accessToken, err := u.generateAccessToken(u.cfg.JwtAccessSecret, username, user.Role, u.cfg.JwtAccessExpirationMins)
+	accessToken, err := u.generateAccessToken(u.cfg.JwtAccessSecret, user.ID, username, user.Role, u.cfg.JwtAccessExpirationMins)
 	if err != nil {
 		return nil, nil, domain.ErrInvalidToken
 	}

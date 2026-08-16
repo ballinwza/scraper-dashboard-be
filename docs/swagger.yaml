@@ -37,6 +37,26 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.UploadFileMultiTenantReqDTO:
+    properties:
+      chatbot_id:
+        type: string
+    required:
+    - chatbot_id
+    type: object
+  dto.UploadFileMultiTenantResDTO:
+    properties:
+      file_id:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+      total_bytes:
+        type: integer
+      total_chunks:
+        type: integer
+    type: object
   handler.apiResponse:
     properties:
       data: {}
@@ -337,6 +357,41 @@ paths:
       summary: Register a new user
       tags:
       - Auth
+  /rag/multi/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Uploads a PDF or Image file using streaming gRPC underneath
+      parameters:
+      - description: Upload Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UploadFileMultiTenantReqDTO'
+      - description: File to upload (PDF, PNG, JPG, WEBP)
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UploadFileMultiTenantResDTO'
+        "400":
+          description: Invalid payload or file type
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Upload file (PDF/Image) to Multi-Tenant RAG
+      tags:
+      - RAG
   /rag/qna:
     post:
       consumes:
@@ -361,6 +416,38 @@ paths:
           schema:
             $ref: '#/definitions/handler.errorResponse'
       summary: Ask question for answer
+      tags:
+      - RAG
+  /rag/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Receive multipart file, read bytes, and process via RAG UseCase
+        (gRPC)
+      parameters:
+      - description: Document File
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Upload PDF/Image file
       tags:
       - RAG
   /rental/estate/{id}:

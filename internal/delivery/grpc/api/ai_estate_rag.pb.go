@@ -9,6 +9,7 @@ package grpc_api
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -21,9 +22,60 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// UploadFileStramMultiTenant
+type FileStatus int32
+
+const (
+	FileStatus_PENDING   FileStatus = 0
+	FileStatus_COMPLETED FileStatus = 1
+	FileStatus_FAILED    FileStatus = 2
+)
+
+// Enum value maps for FileStatus.
+var (
+	FileStatus_name = map[int32]string{
+		0: "PENDING",
+		1: "COMPLETED",
+		2: "FAILED",
+	}
+	FileStatus_value = map[string]int32{
+		"PENDING":   0,
+		"COMPLETED": 1,
+		"FAILED":    2,
+	}
+)
+
+func (x FileStatus) Enum() *FileStatus {
+	p := new(FileStatus)
+	*p = x
+	return p
+}
+
+func (x FileStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (FileStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_ai_estate_rag_proto_enumTypes[0].Descriptor()
+}
+
+func (FileStatus) Type() protoreflect.EnumType {
+	return &file_ai_estate_rag_proto_enumTypes[0]
+}
+
+func (x FileStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use FileStatus.Descriptor instead.
+func (FileStatus) EnumDescriptor() ([]byte, []int) {
+	return file_ai_estate_rag_proto_rawDescGZIP(), []int{0}
+}
+
+// Query
 type ChatRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Question      string                 `protobuf:"bytes,1,opt,name=question,proto3" json:"question,omitempty"` // เช่น "สรุปเอกสาร"
+	Question      string                 `protobuf:"bytes,1,opt,name=question,proto3" json:"question,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -67,7 +119,7 @@ func (x *ChatRequest) GetQuestion() string {
 
 type ChatResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"` // ข้อความแจ้งสถานะการทำงาน
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -109,17 +161,486 @@ func (x *ChatResponse) GetMessage() string {
 	return ""
 }
 
+// UploadPdf
+type PdfMetadata struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Filename      string                 `protobuf:"bytes,1,opt,name=filename,proto3" json:"filename,omitempty"`
+	FileSize      int64                  `protobuf:"varint,2,opt,name=file_size,json=fileSize,proto3" json:"file_size,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PdfMetadata) Reset() {
+	*x = PdfMetadata{}
+	mi := &file_ai_estate_rag_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PdfMetadata) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PdfMetadata) ProtoMessage() {}
+
+func (x *PdfMetadata) ProtoReflect() protoreflect.Message {
+	mi := &file_ai_estate_rag_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PdfMetadata.ProtoReflect.Descriptor instead.
+func (*PdfMetadata) Descriptor() ([]byte, []int) {
+	return file_ai_estate_rag_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *PdfMetadata) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
+}
+
+func (x *PdfMetadata) GetFileSize() int64 {
+	if x != nil {
+		return x.FileSize
+	}
+	return 0
+}
+
+type UploadPdfRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Data:
+	//
+	//	*UploadPdfRequest_Metadata
+	//	*UploadPdfRequest_ChunkData
+	Data          isUploadPdfRequest_Data `protobuf_oneof:"data"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UploadPdfRequest) Reset() {
+	*x = UploadPdfRequest{}
+	mi := &file_ai_estate_rag_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UploadPdfRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadPdfRequest) ProtoMessage() {}
+
+func (x *UploadPdfRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ai_estate_rag_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadPdfRequest.ProtoReflect.Descriptor instead.
+func (*UploadPdfRequest) Descriptor() ([]byte, []int) {
+	return file_ai_estate_rag_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *UploadPdfRequest) GetData() isUploadPdfRequest_Data {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *UploadPdfRequest) GetMetadata() *PdfMetadata {
+	if x != nil {
+		if x, ok := x.Data.(*UploadPdfRequest_Metadata); ok {
+			return x.Metadata
+		}
+	}
+	return nil
+}
+
+func (x *UploadPdfRequest) GetChunkData() []byte {
+	if x != nil {
+		if x, ok := x.Data.(*UploadPdfRequest_ChunkData); ok {
+			return x.ChunkData
+		}
+	}
+	return nil
+}
+
+type isUploadPdfRequest_Data interface {
+	isUploadPdfRequest_Data()
+}
+
+type UploadPdfRequest_Metadata struct {
+	Metadata *PdfMetadata `protobuf:"bytes,1,opt,name=metadata,proto3,oneof"`
+}
+
+type UploadPdfRequest_ChunkData struct {
+	ChunkData []byte `protobuf:"bytes,2,opt,name=chunk_data,json=chunkData,proto3,oneof"`
+}
+
+func (*UploadPdfRequest_Metadata) isUploadPdfRequest_Data() {}
+
+func (*UploadPdfRequest_ChunkData) isUploadPdfRequest_Data() {}
+
+type UploadPdfResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FileId        string                 `protobuf:"bytes,1,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
+	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UploadPdfResponse) Reset() {
+	*x = UploadPdfResponse{}
+	mi := &file_ai_estate_rag_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UploadPdfResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadPdfResponse) ProtoMessage() {}
+
+func (x *UploadPdfResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ai_estate_rag_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadPdfResponse.ProtoReflect.Descriptor instead.
+func (*UploadPdfResponse) Descriptor() ([]byte, []int) {
+	return file_ai_estate_rag_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *UploadPdfResponse) GetFileId() string {
+	if x != nil {
+		return x.FileId
+	}
+	return ""
+}
+
+func (x *UploadPdfResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *UploadPdfResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type FileMetadata struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	ChatbotId     string                 `protobuf:"bytes,2,opt,name=chatbot_id,json=chatbotId,proto3" json:"chatbot_id,omitempty"`
+	Filename      string                 `protobuf:"bytes,3,opt,name=filename,proto3" json:"filename,omitempty"`
+	FileType      string                 `protobuf:"bytes,4,opt,name=file_type,json=fileType,proto3" json:"file_type,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FileMetadata) Reset() {
+	*x = FileMetadata{}
+	mi := &file_ai_estate_rag_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FileMetadata) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FileMetadata) ProtoMessage() {}
+
+func (x *FileMetadata) ProtoReflect() protoreflect.Message {
+	mi := &file_ai_estate_rag_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FileMetadata.ProtoReflect.Descriptor instead.
+func (*FileMetadata) Descriptor() ([]byte, []int) {
+	return file_ai_estate_rag_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *FileMetadata) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *FileMetadata) GetChatbotId() string {
+	if x != nil {
+		return x.ChatbotId
+	}
+	return ""
+}
+
+func (x *FileMetadata) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
+}
+
+func (x *FileMetadata) GetFileType() string {
+	if x != nil {
+		return x.FileType
+	}
+	return ""
+}
+
+type UploadFileStreamRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Payload:
+	//
+	//	*UploadFileStreamRequest_Metadata
+	//	*UploadFileStreamRequest_ChunkData
+	Payload       isUploadFileStreamRequest_Payload `protobuf_oneof:"payload"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UploadFileStreamRequest) Reset() {
+	*x = UploadFileStreamRequest{}
+	mi := &file_ai_estate_rag_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UploadFileStreamRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadFileStreamRequest) ProtoMessage() {}
+
+func (x *UploadFileStreamRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ai_estate_rag_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadFileStreamRequest.ProtoReflect.Descriptor instead.
+func (*UploadFileStreamRequest) Descriptor() ([]byte, []int) {
+	return file_ai_estate_rag_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *UploadFileStreamRequest) GetPayload() isUploadFileStreamRequest_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+func (x *UploadFileStreamRequest) GetMetadata() *FileMetadata {
+	if x != nil {
+		if x, ok := x.Payload.(*UploadFileStreamRequest_Metadata); ok {
+			return x.Metadata
+		}
+	}
+	return nil
+}
+
+func (x *UploadFileStreamRequest) GetChunkData() []byte {
+	if x != nil {
+		if x, ok := x.Payload.(*UploadFileStreamRequest_ChunkData); ok {
+			return x.ChunkData
+		}
+	}
+	return nil
+}
+
+type isUploadFileStreamRequest_Payload interface {
+	isUploadFileStreamRequest_Payload()
+}
+
+type UploadFileStreamRequest_Metadata struct {
+	Metadata *FileMetadata `protobuf:"bytes,1,opt,name=metadata,proto3,oneof"`
+}
+
+type UploadFileStreamRequest_ChunkData struct {
+	ChunkData []byte `protobuf:"bytes,2,opt,name=chunk_data,json=chunkData,proto3,oneof"`
+}
+
+func (*UploadFileStreamRequest_Metadata) isUploadFileStreamRequest_Payload() {}
+
+func (*UploadFileStreamRequest_ChunkData) isUploadFileStreamRequest_Payload() {}
+
+type UploadFileStreamResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FileId        string                 `protobuf:"bytes,1,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
+	Status        FileStatus             `protobuf:"varint,2,opt,name=status,proto3,enum=chat.v1.FileStatus" json:"status,omitempty"`
+	TotalChunks   int32                  `protobuf:"varint,3,opt,name=total_chunks,json=totalChunks,proto3" json:"total_chunks,omitempty"`
+	TotalBytes    int64                  `protobuf:"varint,4,opt,name=total_bytes,json=totalBytes,proto3" json:"total_bytes,omitempty"`
+	Message       string                 `protobuf:"bytes,5,opt,name=message,proto3" json:"message,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UploadFileStreamResponse) Reset() {
+	*x = UploadFileStreamResponse{}
+	mi := &file_ai_estate_rag_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UploadFileStreamResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadFileStreamResponse) ProtoMessage() {}
+
+func (x *UploadFileStreamResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ai_estate_rag_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadFileStreamResponse.ProtoReflect.Descriptor instead.
+func (*UploadFileStreamResponse) Descriptor() ([]byte, []int) {
+	return file_ai_estate_rag_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *UploadFileStreamResponse) GetFileId() string {
+	if x != nil {
+		return x.FileId
+	}
+	return ""
+}
+
+func (x *UploadFileStreamResponse) GetStatus() FileStatus {
+	if x != nil {
+		return x.Status
+	}
+	return FileStatus_PENDING
+}
+
+func (x *UploadFileStreamResponse) GetTotalChunks() int32 {
+	if x != nil {
+		return x.TotalChunks
+	}
+	return 0
+}
+
+func (x *UploadFileStreamResponse) GetTotalBytes() int64 {
+	if x != nil {
+		return x.TotalBytes
+	}
+	return 0
+}
+
+func (x *UploadFileStreamResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *UploadFileStreamResponse) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
 var File_ai_estate_rag_proto protoreflect.FileDescriptor
 
 const file_ai_estate_rag_proto_rawDesc = "" +
 	"\n" +
-	"\x13ai_estate_rag.proto\x12\achat.v1\")\n" +
+	"\x13ai_estate_rag.proto\x12\achat.v1\x1a\x1fgoogle/protobuf/timestamp.proto\")\n" +
 	"\vChatRequest\x12\x1a\n" +
 	"\bquestion\x18\x01 \x01(\tR\bquestion\"(\n" +
 	"\fChatResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage2B\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"F\n" +
+	"\vPdfMetadata\x12\x1a\n" +
+	"\bfilename\x18\x01 \x01(\tR\bfilename\x12\x1b\n" +
+	"\tfile_size\x18\x02 \x01(\x03R\bfileSize\"o\n" +
+	"\x10UploadPdfRequest\x122\n" +
+	"\bmetadata\x18\x01 \x01(\v2\x14.chat.v1.PdfMetadataH\x00R\bmetadata\x12\x1f\n" +
+	"\n" +
+	"chunk_data\x18\x02 \x01(\fH\x00R\tchunkDataB\x06\n" +
+	"\x04data\"`\n" +
+	"\x11UploadPdfResponse\x12\x17\n" +
+	"\afile_id\x18\x01 \x01(\tR\x06fileId\x12\x18\n" +
+	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\"\x7f\n" +
+	"\fFileMetadata\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1d\n" +
+	"\n" +
+	"chatbot_id\x18\x02 \x01(\tR\tchatbotId\x12\x1a\n" +
+	"\bfilename\x18\x03 \x01(\tR\bfilename\x12\x1b\n" +
+	"\tfile_type\x18\x04 \x01(\tR\bfileType\"z\n" +
+	"\x17UploadFileStreamRequest\x123\n" +
+	"\bmetadata\x18\x01 \x01(\v2\x15.chat.v1.FileMetadataH\x00R\bmetadata\x12\x1f\n" +
+	"\n" +
+	"chunk_data\x18\x02 \x01(\fH\x00R\tchunkDataB\t\n" +
+	"\apayload\"\xf9\x01\n" +
+	"\x18UploadFileStreamResponse\x12\x17\n" +
+	"\afile_id\x18\x01 \x01(\tR\x06fileId\x12+\n" +
+	"\x06status\x18\x02 \x01(\x0e2\x13.chat.v1.FileStatusR\x06status\x12!\n" +
+	"\ftotal_chunks\x18\x03 \x01(\x05R\vtotalChunks\x12\x1f\n" +
+	"\vtotal_bytes\x18\x04 \x01(\x03R\n" +
+	"totalBytes\x12\x18\n" +
+	"\amessage\x18\x05 \x01(\tR\amessage\x129\n" +
+	"\n" +
+	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt*4\n" +
+	"\n" +
+	"FileStatus\x12\v\n" +
+	"\aPENDING\x10\x00\x12\r\n" +
+	"\tCOMPLETED\x10\x01\x12\n" +
+	"\n" +
+	"\x06FAILED\x10\x022\xed\x01\n" +
 	"\bChatGRPC\x126\n" +
-	"\x05Query\x12\x14.chat.v1.ChatRequest\x1a\x15.chat.v1.ChatResponse\"\x00BAZ?github.com/ballinwza/scraper-dashboard-be/api/proto/v1;grpc_apib\x06proto3"
+	"\x05Query\x12\x14.chat.v1.ChatRequest\x1a\x15.chat.v1.ChatResponse\"\x00\x12D\n" +
+	"\tUploadPdf\x12\x19.chat.v1.UploadPdfRequest\x1a\x1a.chat.v1.UploadPdfResponse(\x01\x12c\n" +
+	"\x1aUploadFileStramMultiTenant\x12 .chat.v1.UploadFileStreamRequest\x1a!.chat.v1.UploadFileStreamResponse(\x01BAZ?github.com/ballinwza/scraper-dashboard-be/api/proto/v1;grpc_apib\x06proto3"
 
 var (
 	file_ai_estate_rag_proto_rawDescOnce sync.Once
@@ -133,19 +654,36 @@ func file_ai_estate_rag_proto_rawDescGZIP() []byte {
 	return file_ai_estate_rag_proto_rawDescData
 }
 
-var file_ai_estate_rag_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_ai_estate_rag_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_ai_estate_rag_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_ai_estate_rag_proto_goTypes = []any{
-	(*ChatRequest)(nil),  // 0: chat.v1.ChatRequest
-	(*ChatResponse)(nil), // 1: chat.v1.ChatResponse
+	(FileStatus)(0),                  // 0: chat.v1.FileStatus
+	(*ChatRequest)(nil),              // 1: chat.v1.ChatRequest
+	(*ChatResponse)(nil),             // 2: chat.v1.ChatResponse
+	(*PdfMetadata)(nil),              // 3: chat.v1.PdfMetadata
+	(*UploadPdfRequest)(nil),         // 4: chat.v1.UploadPdfRequest
+	(*UploadPdfResponse)(nil),        // 5: chat.v1.UploadPdfResponse
+	(*FileMetadata)(nil),             // 6: chat.v1.FileMetadata
+	(*UploadFileStreamRequest)(nil),  // 7: chat.v1.UploadFileStreamRequest
+	(*UploadFileStreamResponse)(nil), // 8: chat.v1.UploadFileStreamResponse
+	(*timestamppb.Timestamp)(nil),    // 9: google.protobuf.Timestamp
 }
 var file_ai_estate_rag_proto_depIdxs = []int32{
-	0, // 0: chat.v1.ChatGRPC.Query:input_type -> chat.v1.ChatRequest
-	1, // 1: chat.v1.ChatGRPC.Query:output_type -> chat.v1.ChatResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	3, // 0: chat.v1.UploadPdfRequest.metadata:type_name -> chat.v1.PdfMetadata
+	6, // 1: chat.v1.UploadFileStreamRequest.metadata:type_name -> chat.v1.FileMetadata
+	0, // 2: chat.v1.UploadFileStreamResponse.status:type_name -> chat.v1.FileStatus
+	9, // 3: chat.v1.UploadFileStreamResponse.created_at:type_name -> google.protobuf.Timestamp
+	1, // 4: chat.v1.ChatGRPC.Query:input_type -> chat.v1.ChatRequest
+	4, // 5: chat.v1.ChatGRPC.UploadPdf:input_type -> chat.v1.UploadPdfRequest
+	7, // 6: chat.v1.ChatGRPC.UploadFileStramMultiTenant:input_type -> chat.v1.UploadFileStreamRequest
+	2, // 7: chat.v1.ChatGRPC.Query:output_type -> chat.v1.ChatResponse
+	5, // 8: chat.v1.ChatGRPC.UploadPdf:output_type -> chat.v1.UploadPdfResponse
+	8, // 9: chat.v1.ChatGRPC.UploadFileStramMultiTenant:output_type -> chat.v1.UploadFileStreamResponse
+	7, // [7:10] is the sub-list for method output_type
+	4, // [4:7] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_ai_estate_rag_proto_init() }
@@ -153,18 +691,27 @@ func file_ai_estate_rag_proto_init() {
 	if File_ai_estate_rag_proto != nil {
 		return
 	}
+	file_ai_estate_rag_proto_msgTypes[3].OneofWrappers = []any{
+		(*UploadPdfRequest_Metadata)(nil),
+		(*UploadPdfRequest_ChunkData)(nil),
+	}
+	file_ai_estate_rag_proto_msgTypes[6].OneofWrappers = []any{
+		(*UploadFileStreamRequest_Metadata)(nil),
+		(*UploadFileStreamRequest_ChunkData)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ai_estate_rag_proto_rawDesc), len(file_ai_estate_rag_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   2,
+			NumEnums:      1,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_ai_estate_rag_proto_goTypes,
 		DependencyIndexes: file_ai_estate_rag_proto_depIdxs,
+		EnumInfos:         file_ai_estate_rag_proto_enumTypes,
 		MessageInfos:      file_ai_estate_rag_proto_msgTypes,
 	}.Build()
 	File_ai_estate_rag_proto = out.File

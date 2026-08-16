@@ -1,9 +1,12 @@
 package handler
 
 import (
+	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/ballinwza/scraper-dashboard-be/config"
+	"github.com/ballinwza/scraper-dashboard-be/internal/delivery/http/dto"
 	usecase_rag "github.com/ballinwza/scraper-dashboard-be/internal/usecase/rag"
 	"github.com/ballinwza/scraper-dashboard-be/pkg/validator"
 	"github.com/gin-gonic/gin"
@@ -59,4 +62,136 @@ func (h *RagHandler) AskQuestion(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, res)
+}
+
+// UploadPdf
+// @Summary Upload PDF/Image file
+// @Description Receive multipart file, read bytes, and process via RAG UseCase (gRPC)
+// @Tags RAG
+// @Accept multipart/form-data
+// @Produce json
+// @Param file formData file true "Document File"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Router /rag/upload [post]
+func (h *RagHandler) RecieverOfUplodFile(c *gin.Context) {
+	fileHeader, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to get file from request: " + err.Error()})
+		return
+	}
+
+	// 2. เปิดไฟล์เพื่ออ่านข้อมูล
+	file, err := fileHeader.Open()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open file: " + err.Error()})
+		return
+	}
+	defer file.Close()
+
+	filename := fileHeader.Filename
+	// contentType := fileHeader.Header.Get("Content-Type")
+
+	// 3. อ่านเนื้อหาไฟล์ทั้งหมดให้อยู่ในรูปแบบ []byte ก้อนเดียว
+	fileBytes, err := io.ReadAll(file)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read file bytes: " + err.Error()})
+		return
+	}
+	result, err := h.usecase.ReceiverOfUploadFile(
+		c.Request.Context(),
+		fileBytes,
+		filename,
+		// contentType,
+	)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// res := generateAnswerResponse{
+	// 	Message: answer,
+	// }
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "File uploaded successfully",
+		"data":    result,
+	})
+
+	// c.JSON(http.StatusOK, res)
+}
+
+// UploadFileMultiTenant
+// @Summary      Upload file (PDF/Image) to Multi-Tenant RAG
+// @Description  Uploads a PDF or Image file using streaming gRPC underneath
+// @Tags         RAG
+// @Accept       multipart/form-data
+// @Produce      json
+// @Param request body dto.UploadFileMultiTenantReqDTO true "Upload Request"
+// @Param        file        formData  file    true  "File to upload (PDF, PNG, JPG, WEBP)"
+// @Success      200         {object}  dto.UploadFileMultiTenantResDTO
+// @Failure      400         {object}  errorResponse "Invalid payload or file type"
+// @Failure      500         {object}  errorResponse "Internal server error"
+// @Router       /rag/multi/upload [post]
+func (h *RagHandler) UploadFileMultiTenant(c *gin.Context) {
+	userId, exists := c.Get(config.USER_ID_KEY)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	userId, ok := userId.(string)
+	if !ok || userId == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user session"})
+		return
+	}
+
+	var reqDto dto.UploadFileMultiTenantReqDTO
+
+	// 1. Bind Multipart Form Data
+	if err := c.ShouldBind(&reqDto); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// 2. Validate Content-Type / File Extension
+	fileHeader, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to get file from request: " + err.Error()})
+		return
+	}
+
+	// 3. อ่านไฟล์เปลี่ยนเป็น []byte
+	file, err := fileHeader.Open()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open uploaded file"})
+		return
+	}
+	defer file.Close()
+
+	filename := fileHeader.Filename
+	contentType := fileHeader.Header.Get("Content-Type")
+
+	fileBytes, err := io.ReadAll(file)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read file content"})
+		return
+	}
+
+	// 5. เรียกใช้ gRPC Stream Repository
+	result, err := h.usecase.MultiTenantUploadFile(
+		c.Request.Context(),
+		userId.(string),
+		reqDto.ChatbotId,
+		filename,
+		contentType,
+		fileBytes,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to stream upload: %v", err)})
+		return
+	}
+
+	// 6. Return Response กลับ HTTP Client
+	c.JSON(http.StatusOK, result)
 }

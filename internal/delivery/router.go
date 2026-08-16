@@ -69,6 +69,8 @@ func SetupRouter(
 		ragGroup.Use(middleware.JWTAuthMiddleware(cfg.JwtAccessSecret))
 		{
 			ragGroup.POST("/qna", ragHandler.AskQuestion)
+			ragGroup.POST("/upload", ragHandler.RecieverOfUplodFile)
+			ragGroup.POST("/multi/upload", ragHandler.UploadFileMultiTenant)
 		}
 
 	}

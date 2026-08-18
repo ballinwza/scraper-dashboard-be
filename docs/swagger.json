@@ -195,6 +195,463 @@
                 }
             }
         },
+        "/chat-sessions/create": {
+            "post": {
+                "description": "Create a new chat session for a specific chatbot",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chat Session"
+                ],
+                "summary": "Create Chat Session",
+                "parameters": [
+                    {
+                        "description": "Create Chat Session Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateChatSessionReqDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateChatSessionResDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/chat-sessions/delete": {
+            "delete": {
+                "description": "Delete a chat session by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chat Session"
+                ],
+                "summary": "Delete Chat Session",
+                "parameters": [
+                    {
+                        "description": "Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DeleteChatSessionReqDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/chat-sessions/list": {
+            "post": {
+                "description": "Get a paginated list of chat sessions for a user or chatbot",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chat Session"
+                ],
+                "summary": "List Chat Sessions",
+                "parameters": [
+                    {
+                        "description": "Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ListChatSessionsReqDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ListChatSessionsResDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/chat-sessions/messages": {
+            "post": {
+                "description": "Add a new chat message to an existing session",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chat Session"
+                ],
+                "summary": "Add Chat Message",
+                "parameters": [
+                    {
+                        "description": "Add Chat Message Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AddChatMessageReqDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.AddChatMessageResDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/chat-sessions/{id}": {
+            "get": {
+                "description": "Get specific chat session details and message history",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chat Session"
+                ],
+                "summary": "Get Chat Session by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Session ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetChatSessionResDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/chatbots/create": {
+            "post": {
+                "description": "Create a new chatbot blueprint for a specific user/tenant",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chatbot"
+                ],
+                "summary": "Create Multi-Tenant Chatbot",
+                "parameters": [
+                    {
+                        "description": "Create Chatbot Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateMultiTenantChatbotReqDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateMultiTenantChatbotResDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/chatbots/delete": {
+            "delete": {
+                "description": "Delete a chatbot blueprint by ID and User ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chatbot"
+                ],
+                "summary": "Delete Multi-Tenant Chatbot",
+                "parameters": [
+                    {
+                        "description": "Update Chatbot Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DeleteMultiTenantChatbotReqDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DeleteMultiTenantChatbotResDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/chatbots/list": {
+            "post": {
+                "description": "Get a paginated list of chatbot blueprints for a specific user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chatbot"
+                ],
+                "summary": "List Multi-Tenant Chatbots",
+                "parameters": [
+                    {
+                        "description": "Create Chat Session Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ListMultiTenantChatbotsReqDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ListMultiTenantChatbotsResDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/chatbots/update": {
+            "post": {
+                "description": "Update details of an existing chatbot blueprint",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chatbot"
+                ],
+                "summary": "Update Multi-Tenant Chatbot",
+                "parameters": [
+                    {
+                        "description": "Update Chatbot Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateMultiTenantChatbotReqDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateMultiTenantChatbotResDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/chatbots/{id}": {
+            "get": {
+                "description": "Get specific chatbot blueprint details by its ID and User ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chatbot"
+                ],
+                "summary": "Get Multi-Tenant Chatbot by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chatbot ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetMultiTenantChatbotResDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/knowledge-files/delete": {
             "delete": {
                 "description": "Delete a knowledge file associated with a chatbot and user",
@@ -417,6 +874,52 @@
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/rag/search-similar": {
+            "post": {
+                "description": "Search similar content from knowledge base using vector similarity search",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RAG"
+                ],
+                "summary": "Search Similar Knowledge (RAG)",
+                "parameters": [
+                    {
+                        "description": "Search Similar Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SearchSimilarReqDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SearchSimilarResDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/handler.errorResponse"
                         }
@@ -968,6 +1471,186 @@
                 }
             }
         },
+        "dto.AddChatMessageReqDTO": {
+            "type": "object",
+            "required": [
+                "content",
+                "role",
+                "session_id"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string",
+                    "example": "สวัสดีครับ มีโปรโมชั่นคอนโดอะไรบ้าง"
+                },
+                "role": {
+                    "type": "string",
+                    "example": "USER"
+                },
+                "session_id": {
+                    "type": "string",
+                    "example": "65f1a2b3c4d5e6f7a8b9c0d1"
+                }
+            }
+        },
+        "dto.AddChatMessageResDTO": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "$ref": "#/definitions/dto.ChatMessageResDTO"
+                }
+            }
+        },
+        "dto.ChatMessageResDTO": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string",
+                    "example": "สวัสดีครับ มีโปรโมชั่นคอนโดอะไรบ้าง"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2026-08-18T10:00:00Z"
+                },
+                "role": {
+                    "type": "string",
+                    "example": "USER"
+                }
+            }
+        },
+        "dto.ChatSessionResDTO": {
+            "type": "object",
+            "properties": {
+                "chatbot_id": {
+                    "type": "string",
+                    "example": "bot-888"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2026-08-18T10:00:00Z"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "65f1a2b3c4d5e6f7a8b9c0d1"
+                },
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ChatMessageResDTO"
+                    }
+                },
+                "session_title": {
+                    "type": "string",
+                    "example": "สอบถามข้อมูลโปรโมชั่น"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2026-08-18T10:05:00Z"
+                },
+                "user_id": {
+                    "type": "string",
+                    "example": "user-999"
+                }
+            }
+        },
+        "dto.ChatbotBlueprintResDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string",
+                    "example": "2026-08-18T10:00:00Z"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "บอทสำหรับตอบคำถามและดูแลลูกค้า"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "65f1a2b3c4d5e6f7a8b9c0d1"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Customer Support Bot"
+                },
+                "system_prompt": {
+                    "type": "string",
+                    "example": "You are a helpful assistant."
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2026-08-18T10:05:00Z"
+                },
+                "user_id": {
+                    "type": "string",
+                    "example": "user-999"
+                }
+            }
+        },
+        "dto.CreateChatSessionReqDTO": {
+            "type": "object",
+            "required": [
+                "chatbot_id"
+            ],
+            "properties": {
+                "chatbot_id": {
+                    "type": "string",
+                    "example": "bot-888"
+                },
+                "session_title": {
+                    "type": "string",
+                    "example": "สอบถามข้อมูลโปรโมชั่น"
+                }
+            }
+        },
+        "dto.CreateChatSessionResDTO": {
+            "type": "object",
+            "properties": {
+                "session": {
+                    "$ref": "#/definitions/dto.ChatSessionResDTO"
+                }
+            }
+        },
+        "dto.CreateMultiTenantChatbotReqDTO": {
+            "type": "object",
+            "required": [
+                "name",
+                "system_prompt"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "บอทสำหรับตอบคำถามและดูแลลูกค้า"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Customer Support Bot"
+                },
+                "system_prompt": {
+                    "type": "string",
+                    "example": "You are a helpful assistant."
+                }
+            }
+        },
+        "dto.CreateMultiTenantChatbotResDTO": {
+            "type": "object",
+            "properties": {
+                "chatbot": {
+                    "$ref": "#/definitions/dto.ChatbotBlueprintResDTO"
+                }
+            }
+        },
+        "dto.DeleteChatSessionReqDTO": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "65f1a2b3c4d5e6f7a8b9c0d1"
+                }
+            }
+        },
         "dto.DeleteKnowledgeFileReqDTO": {
             "type": "object",
             "required": [
@@ -976,6 +1659,82 @@
             "properties": {
                 "chatbot_id": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.DeleteMultiTenantChatbotReqDTO": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "65f1a2b3c4d5e6f7a8b9c0d1"
+                }
+            }
+        },
+        "dto.DeleteMultiTenantChatbotResDTO": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Chatbot deleted successfully"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "dto.GetChatSessionResDTO": {
+            "type": "object",
+            "properties": {
+                "session": {
+                    "$ref": "#/definitions/dto.ChatSessionResDTO"
+                }
+            }
+        },
+        "dto.GetMultiTenantChatbotResDTO": {
+            "type": "object",
+            "properties": {
+                "chatbot": {
+                    "$ref": "#/definitions/dto.ChatbotBlueprintResDTO"
+                }
+            }
+        },
+        "dto.ListChatSessionsReqDTO": {
+            "type": "object",
+            "properties": {
+                "chatbot_id": {
+                    "type": "string",
+                    "example": "bot-888"
+                },
+                "page_size": {
+                    "type": "integer",
+                    "maximum": 100,
+                    "minimum": 1,
+                    "example": 20
+                },
+                "page_token": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "example": 0
+                }
+            }
+        },
+        "dto.ListChatSessionsResDTO": {
+            "type": "object",
+            "properties": {
+                "sessions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ChatSessionResDTO"
+                    }
+                },
+                "total_count": {
+                    "type": "integer",
+                    "example": 5
                 }
             }
         },
@@ -998,6 +1757,158 @@
                 }
             }
         },
+        "dto.ListMultiTenantChatbotsReqDTO": {
+            "type": "object",
+            "properties": {
+                "page_size": {
+                    "type": "integer",
+                    "maximum": 100,
+                    "minimum": 1,
+                    "example": 10
+                },
+                "page_token": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "example": 0
+                }
+            }
+        },
+        "dto.ListMultiTenantChatbotsResDTO": {
+            "type": "object",
+            "properties": {
+                "chatbots": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ChatbotBlueprintResDTO"
+                    }
+                },
+                "next_page_token": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "total_count": {
+                    "type": "integer",
+                    "example": 25
+                }
+            }
+        },
+        "dto.MetadataVectorRecordDTO": {
+            "type": "object",
+            "properties": {
+                "chatbot_id": {
+                    "type": "string",
+                    "example": "bot-888"
+                },
+                "chunk_index": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "file_id": {
+                    "type": "string",
+                    "example": "file-123"
+                },
+                "filename": {
+                    "type": "string",
+                    "example": "document.pdf"
+                },
+                "page_number": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "text_content": {
+                    "type": "string",
+                    "example": "เนื้อหาในเอกสารที่ค้นพบ..."
+                },
+                "user_id": {
+                    "type": "string",
+                    "example": "user-999"
+                }
+            }
+        },
+        "dto.SearchSimilarReqDTO": {
+            "type": "object",
+            "required": [
+                "chatbot_id",
+                "query_text"
+            ],
+            "properties": {
+                "chatbot_id": {
+                    "type": "string",
+                    "example": "bot-888"
+                },
+                "knowledge_file_id": {
+                    "type": "string",
+                    "example": "file-123"
+                },
+                "query_text": {
+                    "type": "string",
+                    "example": "สอบถามข้อมูลโปรโมชั่น"
+                },
+                "top_k": {
+                    "type": "integer",
+                    "example": 5
+                }
+            }
+        },
+        "dto.SearchSimilarResDTO": {
+            "type": "object",
+            "properties": {
+                "answer_message": {
+                    "type": "string",
+                    "example": "นี่คือคำตอบจากระบบ..."
+                },
+                "sources": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.SearchVectorRecordItemDTO"
+                    }
+                }
+            }
+        },
+        "dto.SearchVectorRecordItemDTO": {
+            "type": "object",
+            "properties": {
+                "record": {
+                    "$ref": "#/definitions/dto.VectorRecordDTO"
+                },
+                "score": {
+                    "type": "number",
+                    "example": 0.895
+                }
+            }
+        },
+        "dto.UpdateMultiTenantChatbotReqDTO": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Updated description"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "65f1a2b3c4d5e6f7a8b9c0d1"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Updated Bot Name"
+                },
+                "system_prompt": {
+                    "type": "string",
+                    "example": "Updated system prompt"
+                }
+            }
+        },
+        "dto.UpdateMultiTenantChatbotResDTO": {
+            "type": "object",
+            "properties": {
+                "chatbot": {
+                    "$ref": "#/definitions/dto.ChatbotBlueprintResDTO"
+                }
+            }
+        },
         "dto.UploadFileMultiTenantReqDTO": {
             "type": "object",
             "required": [
@@ -1006,6 +1917,24 @@
             "properties": {
                 "chatbot_id": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.VectorRecordDTO": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "vector-uuid-123"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/dto.MetadataVectorRecordDTO"
+                },
+                "values": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
                 }
             }
         },

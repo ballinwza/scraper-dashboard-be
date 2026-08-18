@@ -17,11 +17,54 @@ type IAiEstateRagRepository interface {
 	GetAnswer(ctx context.Context, question string) (string, error)
 	UploadChunkDocument(ctx context.Context, filename string, fileBytes []byte) (*grpc_api.UploadPdfResponse, error)
 
+	// RAG
+	SearchSimilar(
+		ctx context.Context,
+		userId, chatbotId, query string,
+		top_k *int,
+		knowledge_file_id *string,
+	) (*grpc_api.RagResponseDTO, error)
+
 	// Knowledge File
 	UploadFileStramMultiTenant(ctx context.Context, req domain_ai_estate_rag.UploadFileMultiTenantReq) (*grpc_api.UploadFileStreamResponse, error)
 	GetKnowledgeFile(ctx context.Context, id, userId string) (*grpc_api.GetKnowledgeFileResponse, error)
 	ListKnowledgeFiles(ctx context.Context, chatbot_id, userId string, limit, offset int) (*grpc_api.ListKnowledgeFilesResponse, error)
 	DeleteKnowledgeFile(ctx context.Context, chatbot_id, userId string) (*grpc_api.DeleteKnowledgeFileResponse, error)
+
+	// Chatbot
+	CreateMultiTenantChatbot(
+		ctx context.Context,
+		userId, name, description, systemPrompt string,
+	) (*grpc_api.CreateMultiTenantChatbotResponse, error)
+	GetMultiTenantChatbot(ctx context.Context, id, userId string) (*grpc_api.GetMultiTenantChatbotResponse, error)
+	ListMultiTenantChatbots(
+		ctx context.Context,
+		userId string,
+		pageSize, pageToken int,
+	) (*grpc_api.ListMultiTenantChatbotsResponse, error)
+	UpdateMultiTenantChatbot(
+		ctx context.Context,
+		id, userId, name, description, systemPrompt string,
+	) (*grpc_api.UpdateMultiTenantChatbotResponse, error)
+	DeleteMultiTenantChatbot(ctx context.Context, id, userId string) (*grpc_api.DeleteMultiTenantChatbotResponse, error)
+
+	// Chat Session
+	CreateChatSession(
+		ctx context.Context,
+		userId, chatbotId, sessionTitle string,
+	) (*grpc_api.CreateChatSessionResponse, error)
+	GetChatSession(ctx context.Context, id, userId string) (*grpc_api.GetChatSessionResponse, error)
+	ListChatSessions(
+		ctx context.Context,
+		userId, chatbotId string,
+		pageSize, pageToken int,
+	) (*grpc_api.ListChatSessionsResponse, error)
+	AddChatMessage(
+		ctx context.Context,
+		sessionId, userId, content string,
+		role domain_ai_estate_rag.MessageRole,
+	) (*grpc_api.AddChatMessageResponse, error)
+	DeleteChatSession(ctx context.Context, id, userId string) error
 }
 
 type aiEstateRagRepository struct {

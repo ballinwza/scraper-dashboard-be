@@ -94,7 +94,10 @@ func main() {
 	rentalHandler := handler.NewRentalEstateHandler(rentalEstateUsecase)
 	authHandler := handler.NewUserHandler(authUsecase, cfg)
 	ragHandler := handler.NewRagHandler(ragUsecase, cfg)
+	ragMultiTenantHandler := handler.NewRagMultiTenantHandler(aiEstateRagUsecase)
 	knowledgeFileHandler := handler.NewKnowledgeFileHandler(aiEstateRagUsecase)
+	chatbotHandler := handler.NewChatbotHandler(aiEstateRagUsecase)
+	chatSessionHandler := handler.NewChatSessionHandler(aiEstateRagUsecase)
 
 	// ==========================================
 	// # Initialize & Start HTTP Router (Main Thread)
@@ -106,6 +109,9 @@ func main() {
 		authHandler,
 		ragHandler,
 		knowledgeFileHandler,
+		chatSessionHandler,
+		chatbotHandler,
+		ragMultiTenantHandler,
 	)
 
 	serverAddr := fmt.Sprintf(":%s", cfg.ServerPort)

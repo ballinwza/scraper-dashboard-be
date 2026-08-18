@@ -132,12 +132,190 @@ definitions:
       total_chunks:
         type: integer
     type: object
+  dto.AddChatMessageReqDTO:
+    properties:
+      content:
+        example: สวัสดีครับ มีโปรโมชั่นคอนโดอะไรบ้าง
+        type: string
+      role:
+        example: USER
+        type: string
+      session_id:
+        example: 65f1a2b3c4d5e6f7a8b9c0d1
+        type: string
+    required:
+    - content
+    - role
+    - session_id
+    type: object
+  dto.AddChatMessageResDTO:
+    properties:
+      message:
+        $ref: '#/definitions/dto.ChatMessageResDTO'
+    type: object
+  dto.ChatMessageResDTO:
+    properties:
+      content:
+        example: สวัสดีครับ มีโปรโมชั่นคอนโดอะไรบ้าง
+        type: string
+      created_at:
+        example: "2026-08-18T10:00:00Z"
+        type: string
+      role:
+        example: USER
+        type: string
+    type: object
+  dto.ChatSessionResDTO:
+    properties:
+      chatbot_id:
+        example: bot-888
+        type: string
+      created_at:
+        example: "2026-08-18T10:00:00Z"
+        type: string
+      id:
+        example: 65f1a2b3c4d5e6f7a8b9c0d1
+        type: string
+      messages:
+        items:
+          $ref: '#/definitions/dto.ChatMessageResDTO'
+        type: array
+      session_title:
+        example: สอบถามข้อมูลโปรโมชั่น
+        type: string
+      updated_at:
+        example: "2026-08-18T10:05:00Z"
+        type: string
+      user_id:
+        example: user-999
+        type: string
+    type: object
+  dto.ChatbotBlueprintResDTO:
+    properties:
+      created_at:
+        example: "2026-08-18T10:00:00Z"
+        type: string
+      description:
+        example: บอทสำหรับตอบคำถามและดูแลลูกค้า
+        type: string
+      id:
+        example: 65f1a2b3c4d5e6f7a8b9c0d1
+        type: string
+      name:
+        example: Customer Support Bot
+        type: string
+      system_prompt:
+        example: You are a helpful assistant.
+        type: string
+      updated_at:
+        example: "2026-08-18T10:05:00Z"
+        type: string
+      user_id:
+        example: user-999
+        type: string
+    type: object
+  dto.CreateChatSessionReqDTO:
+    properties:
+      chatbot_id:
+        example: bot-888
+        type: string
+      session_title:
+        example: สอบถามข้อมูลโปรโมชั่น
+        type: string
+    required:
+    - chatbot_id
+    type: object
+  dto.CreateChatSessionResDTO:
+    properties:
+      session:
+        $ref: '#/definitions/dto.ChatSessionResDTO'
+    type: object
+  dto.CreateMultiTenantChatbotReqDTO:
+    properties:
+      description:
+        example: บอทสำหรับตอบคำถามและดูแลลูกค้า
+        type: string
+      name:
+        example: Customer Support Bot
+        type: string
+      system_prompt:
+        example: You are a helpful assistant.
+        type: string
+    required:
+    - name
+    - system_prompt
+    type: object
+  dto.CreateMultiTenantChatbotResDTO:
+    properties:
+      chatbot:
+        $ref: '#/definitions/dto.ChatbotBlueprintResDTO'
+    type: object
+  dto.DeleteChatSessionReqDTO:
+    properties:
+      id:
+        example: 65f1a2b3c4d5e6f7a8b9c0d1
+        type: string
+    required:
+    - id
+    type: object
   dto.DeleteKnowledgeFileReqDTO:
     properties:
       chatbot_id:
         type: string
     required:
     - chatbot_id
+    type: object
+  dto.DeleteMultiTenantChatbotReqDTO:
+    properties:
+      id:
+        example: 65f1a2b3c4d5e6f7a8b9c0d1
+        type: string
+    required:
+    - id
+    type: object
+  dto.DeleteMultiTenantChatbotResDTO:
+    properties:
+      message:
+        example: Chatbot deleted successfully
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  dto.GetChatSessionResDTO:
+    properties:
+      session:
+        $ref: '#/definitions/dto.ChatSessionResDTO'
+    type: object
+  dto.GetMultiTenantChatbotResDTO:
+    properties:
+      chatbot:
+        $ref: '#/definitions/dto.ChatbotBlueprintResDTO'
+    type: object
+  dto.ListChatSessionsReqDTO:
+    properties:
+      chatbot_id:
+        example: bot-888
+        type: string
+      page_size:
+        example: 20
+        maximum: 100
+        minimum: 1
+        type: integer
+      page_token:
+        example: 0
+        minimum: 0
+        type: integer
+    type: object
+  dto.ListChatSessionsResDTO:
+    properties:
+      sessions:
+        items:
+          $ref: '#/definitions/dto.ChatSessionResDTO'
+        type: array
+      total_count:
+        example: 5
+        type: integer
     type: object
   dto.ListKnowledgeFilesReqDTO:
     properties:
@@ -152,12 +330,131 @@ definitions:
     required:
     - chatbot_id
     type: object
+  dto.ListMultiTenantChatbotsReqDTO:
+    properties:
+      page_size:
+        example: 10
+        maximum: 100
+        minimum: 1
+        type: integer
+      page_token:
+        example: 0
+        minimum: 0
+        type: integer
+    type: object
+  dto.ListMultiTenantChatbotsResDTO:
+    properties:
+      chatbots:
+        items:
+          $ref: '#/definitions/dto.ChatbotBlueprintResDTO'
+        type: array
+      next_page_token:
+        example: 10
+        type: integer
+      total_count:
+        example: 25
+        type: integer
+    type: object
+  dto.MetadataVectorRecordDTO:
+    properties:
+      chatbot_id:
+        example: bot-888
+        type: string
+      chunk_index:
+        example: 1
+        type: integer
+      file_id:
+        example: file-123
+        type: string
+      filename:
+        example: document.pdf
+        type: string
+      page_number:
+        example: 5
+        type: integer
+      text_content:
+        example: เนื้อหาในเอกสารที่ค้นพบ...
+        type: string
+      user_id:
+        example: user-999
+        type: string
+    type: object
+  dto.SearchSimilarReqDTO:
+    properties:
+      chatbot_id:
+        example: bot-888
+        type: string
+      knowledge_file_id:
+        example: file-123
+        type: string
+      query_text:
+        example: สอบถามข้อมูลโปรโมชั่น
+        type: string
+      top_k:
+        example: 5
+        type: integer
+    required:
+    - chatbot_id
+    - query_text
+    type: object
+  dto.SearchSimilarResDTO:
+    properties:
+      answer_message:
+        example: นี่คือคำตอบจากระบบ...
+        type: string
+      sources:
+        items:
+          $ref: '#/definitions/dto.SearchVectorRecordItemDTO'
+        type: array
+    type: object
+  dto.SearchVectorRecordItemDTO:
+    properties:
+      record:
+        $ref: '#/definitions/dto.VectorRecordDTO'
+      score:
+        example: 0.895
+        type: number
+    type: object
+  dto.UpdateMultiTenantChatbotReqDTO:
+    properties:
+      description:
+        example: Updated description
+        type: string
+      id:
+        example: 65f1a2b3c4d5e6f7a8b9c0d1
+        type: string
+      name:
+        example: Updated Bot Name
+        type: string
+      system_prompt:
+        example: Updated system prompt
+        type: string
+    required:
+    - id
+    type: object
+  dto.UpdateMultiTenantChatbotResDTO:
+    properties:
+      chatbot:
+        $ref: '#/definitions/dto.ChatbotBlueprintResDTO'
+    type: object
   dto.UploadFileMultiTenantReqDTO:
     properties:
       chatbot_id:
         type: string
     required:
     - chatbot_id
+    type: object
+  dto.VectorRecordDTO:
+    properties:
+      id:
+        example: vector-uuid-123
+        type: string
+      metadata:
+        $ref: '#/definitions/dto.MetadataVectorRecordDTO'
+      values:
+        items:
+          type: number
+        type: array
     type: object
   handler.apiResponse:
     properties:
@@ -459,6 +756,305 @@ paths:
       summary: Register a new user
       tags:
       - Auth
+  /chat-sessions/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get specific chat session details and message history
+      parameters:
+      - description: Session ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GetChatSessionResDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get Chat Session by ID
+      tags:
+      - Chat Session
+  /chat-sessions/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new chat session for a specific chatbot
+      parameters:
+      - description: Create Chat Session Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateChatSessionReqDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.CreateChatSessionResDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Create Chat Session
+      tags:
+      - Chat Session
+  /chat-sessions/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a chat session by ID
+      parameters:
+      - description: Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DeleteChatSessionReqDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Delete Chat Session
+      tags:
+      - Chat Session
+  /chat-sessions/list:
+    post:
+      consumes:
+      - application/json
+      description: Get a paginated list of chat sessions for a user or chatbot
+      parameters:
+      - description: Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ListChatSessionsReqDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ListChatSessionsResDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: List Chat Sessions
+      tags:
+      - Chat Session
+  /chat-sessions/messages:
+    post:
+      consumes:
+      - application/json
+      description: Add a new chat message to an existing session
+      parameters:
+      - description: Add Chat Message Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddChatMessageReqDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.AddChatMessageResDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Add Chat Message
+      tags:
+      - Chat Session
+  /chatbots/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get specific chatbot blueprint details by its ID and User ID
+      parameters:
+      - description: Chatbot ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GetMultiTenantChatbotResDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get Multi-Tenant Chatbot by ID
+      tags:
+      - Chatbot
+  /chatbots/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new chatbot blueprint for a specific user/tenant
+      parameters:
+      - description: Create Chatbot Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateMultiTenantChatbotReqDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.CreateMultiTenantChatbotResDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Create Multi-Tenant Chatbot
+      tags:
+      - Chatbot
+  /chatbots/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a chatbot blueprint by ID and User ID
+      parameters:
+      - description: Update Chatbot Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DeleteMultiTenantChatbotReqDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DeleteMultiTenantChatbotResDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Delete Multi-Tenant Chatbot
+      tags:
+      - Chatbot
+  /chatbots/list:
+    post:
+      consumes:
+      - application/json
+      description: Get a paginated list of chatbot blueprints for a specific user
+      parameters:
+      - description: Create Chat Session Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ListMultiTenantChatbotsReqDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ListMultiTenantChatbotsResDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: List Multi-Tenant Chatbots
+      tags:
+      - Chatbot
+  /chatbots/update:
+    post:
+      consumes:
+      - application/json
+      description: Update details of an existing chatbot blueprint
+      parameters:
+      - description: Update Chatbot Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateMultiTenantChatbotReqDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UpdateMultiTenantChatbotResDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Update Multi-Tenant Chatbot
+      tags:
+      - Chatbot
   /knowledge-files/{id}:
     get:
       consumes:
@@ -607,6 +1203,37 @@ paths:
           schema:
             $ref: '#/definitions/handler.errorResponse'
       summary: Ask question for answer
+      tags:
+      - RAG
+  /rag/search-similar:
+    post:
+      consumes:
+      - application/json
+      description: Search similar content from knowledge base using vector similarity
+        search
+      parameters:
+      - description: Search Similar Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SearchSimilarReqDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SearchSimilarResDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Search Similar Knowledge (RAG)
       tags:
       - RAG
   /rag/upload:

@@ -19,6 +19,9 @@ func SetupRouter(
 	userHandler *handler.UserHandler,
 	ragHandler *handler.RagHandler,
 	knowledgeFileHandler *handler.KnowledgeFileHandler,
+	chatSessionHandler *handler.ChatSessionHandler,
+	chatbotHandler *handler.ChatbotHandler,
+	ragMultiTenantHandler *handler.RagMultiTenantHandler,
 ) *gin.Engine {
 	r := gin.Default()
 
@@ -49,6 +52,28 @@ func SetupRouter(
 		userGroup.Use(middleware.JWTAuthMiddleware(cfg.JwtAccessSecret))
 		{
 			userGroup.GET("/username", userHandler.GetUser)
+		}
+
+		// -- Chatbot --
+		chatbotGroup := api.Group("/chatbots")
+		chatbotGroup.Use(middleware.JWTAuthMiddleware(cfg.JwtAccessSecret))
+		{
+			chatbotGroup.GET("/:id", chatbotHandler.GetMultiTenantChatbot)
+			chatbotGroup.POST("/list", chatbotHandler.ListMultiTenantChatbots)
+			chatbotGroup.DELETE("/delete", chatbotHandler.DeleteMultiTenantChatbot)
+			chatbotGroup.POST("/create", chatbotHandler.CreateMultiTenantChatbot)
+			chatbotGroup.POST("/update", chatbotHandler.UpdateMultiTenantChatbot)
+		}
+
+		// -- Chat session --
+		chatSessionGroup := api.Group("/chat-sessions")
+		chatSessionGroup.Use(middleware.JWTAuthMiddleware(cfg.JwtAccessSecret))
+		{
+			chatSessionGroup.GET("/:id", chatSessionHandler.GetChatSession)
+			chatSessionGroup.POST("/list", chatSessionHandler.ListChatSessions)
+			chatSessionGroup.DELETE("/delete", chatSessionHandler.DeleteChatSession)
+			chatSessionGroup.POST("/create", chatSessionHandler.CreateChatSession)
+			chatSessionGroup.POST("/messages", chatSessionHandler.AddChatMessage)
 		}
 
 		// -- Knowledge File --
@@ -82,6 +107,7 @@ func SetupRouter(
 		{
 			ragGroup.POST("/qna", ragHandler.AskQuestion)
 			ragGroup.POST("/upload", ragHandler.RecieverOfUplodFile)
+			ragGroup.POST("/search-similar", ragMultiTenantHandler.SearchSimilar)
 		}
 
 	}

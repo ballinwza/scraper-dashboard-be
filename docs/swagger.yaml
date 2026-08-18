@@ -37,25 +37,127 @@ definitions:
       updated_at:
         type: string
     type: object
-  dto.UploadFileMultiTenantReqDTO:
+  domain_ai_estate_rag.Chunk:
+    properties:
+      chunk_index:
+        type: integer
+      page_number:
+        type: integer
+      text_content:
+        type: string
+      token_count:
+        type: integer
+      vector_id:
+        type: string
+    type: object
+  domain_ai_estate_rag.DeleteKnowledgeFileResponse:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  domain_ai_estate_rag.FileStatus:
+    enum:
+    - 0
+    - 1
+    - 2
+    format: int32
+    type: integer
+    x-enum-varnames:
+    - FileStatusPending
+    - FileStatusCompleted
+    - FileStatusFailed
+  domain_ai_estate_rag.GetKnowledgeFileResponse:
+    properties:
+      file:
+        $ref: '#/definitions/domain_ai_estate_rag.KnowledgeFile'
+    type: object
+  domain_ai_estate_rag.KnowledgeFile:
+    properties:
+      chatbot_id:
+        type: string
+      chunks:
+        items:
+          $ref: '#/definitions/domain_ai_estate_rag.Chunk'
+        type: array
+      created_at:
+        type: string
+      error_message:
+        description: optional
+        type: string
+      file_size_bytes:
+        type: integer
+      file_type:
+        type: string
+      filename:
+        type: string
+      id:
+        type: string
+      status:
+        $ref: '#/definitions/domain_ai_estate_rag.FileStatus'
+      text_content:
+        description: optional
+        type: string
+      total_chunks:
+        type: integer
+      total_page:
+        type: integer
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  domain_ai_estate_rag.ListKnowledgeFilesResponse:
+    properties:
+      files:
+        items:
+          $ref: '#/definitions/domain_ai_estate_rag.KnowledgeFile'
+        type: array
+      total_count:
+        type: integer
+    type: object
+  domain_ai_estate_rag.UploadFileMultiTenantResponse:
+    properties:
+      created_at:
+        type: string
+      file_id:
+        type: string
+      message:
+        type: string
+      status:
+        $ref: '#/definitions/domain_ai_estate_rag.FileStatus'
+      total_bytes:
+        type: integer
+      total_chunks:
+        type: integer
+    type: object
+  dto.DeleteKnowledgeFileReqDTO:
     properties:
       chatbot_id:
         type: string
     required:
     - chatbot_id
     type: object
-  dto.UploadFileMultiTenantResDTO:
+  dto.ListKnowledgeFilesReqDTO:
     properties:
-      file_id:
+      chatbot_id:
         type: string
-      message:
-        type: string
-      status:
-        type: string
-      total_bytes:
+      limit:
+        default: 10
         type: integer
-      total_chunks:
+      offset:
+        default: 0
         type: integer
+    required:
+    - chatbot_id
+    type: object
+  dto.UploadFileMultiTenantReqDTO:
+    properties:
+      chatbot_id:
+        type: string
+    required:
+    - chatbot_id
     type: object
   handler.apiResponse:
     properties:
@@ -357,7 +459,96 @@ paths:
       summary: Register a new user
       tags:
       - Auth
-  /rag/multi/upload:
+  /knowledge-files/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get specific knowledge file details by its ID and User ID
+      parameters:
+      - description: File ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain_ai_estate_rag.GetKnowledgeFileResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get Knowledge File by ID
+      tags:
+      - Knowledge File
+  /knowledge-files/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a knowledge file associated with a chatbot and user
+      parameters:
+      - description: Delete Knowledge File Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DeleteKnowledgeFileReqDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain_ai_estate_rag.DeleteKnowledgeFileResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Delete Knowledge File
+      tags:
+      - Knowledge File
+  /knowledge-files/list:
+    post:
+      consumes:
+      - application/json
+      description: Get a paginated list of knowledge files for a chatbot
+      parameters:
+      - description: Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ListKnowledgeFilesReqDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain_ai_estate_rag.ListKnowledgeFilesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: List Knowledge Files
+      tags:
+      - Knowledge File
+  /knowledge-files/upload:
     post:
       consumes:
       - multipart/form-data
@@ -380,7 +571,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.UploadFileMultiTenantResDTO'
+            $ref: '#/definitions/domain_ai_estate_rag.UploadFileMultiTenantResponse'
         "400":
           description: Invalid payload or file type
           schema:

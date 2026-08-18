@@ -19,9 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ChatGRPC_Query_FullMethodName                      = "/chat.v1.ChatGRPC/Query"
-	ChatGRPC_UploadPdf_FullMethodName                  = "/chat.v1.ChatGRPC/UploadPdf"
-	ChatGRPC_UploadFileStramMultiTenant_FullMethodName = "/chat.v1.ChatGRPC/UploadFileStramMultiTenant"
+	ChatGRPC_Query_FullMethodName     = "/chat.v1.ChatGRPC/Query"
+	ChatGRPC_UploadPdf_FullMethodName = "/chat.v1.ChatGRPC/UploadPdf"
 )
 
 // ChatGRPCClient is the client API for ChatGRPC service.
@@ -30,7 +29,6 @@ const (
 type ChatGRPCClient interface {
 	Query(ctx context.Context, in *ChatRequest, opts ...grpc.CallOption) (*ChatResponse, error)
 	UploadPdf(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UploadPdfRequest, UploadPdfResponse], error)
-	UploadFileStramMultiTenant(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UploadFileStreamRequest, UploadFileStreamResponse], error)
 }
 
 type chatGRPCClient struct {
@@ -64,26 +62,12 @@ func (c *chatGRPCClient) UploadPdf(ctx context.Context, opts ...grpc.CallOption)
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ChatGRPC_UploadPdfClient = grpc.ClientStreamingClient[UploadPdfRequest, UploadPdfResponse]
 
-func (c *chatGRPCClient) UploadFileStramMultiTenant(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UploadFileStreamRequest, UploadFileStreamResponse], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ChatGRPC_ServiceDesc.Streams[1], ChatGRPC_UploadFileStramMultiTenant_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[UploadFileStreamRequest, UploadFileStreamResponse]{ClientStream: stream}
-	return x, nil
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type ChatGRPC_UploadFileStramMultiTenantClient = grpc.ClientStreamingClient[UploadFileStreamRequest, UploadFileStreamResponse]
-
 // ChatGRPCServer is the server API for ChatGRPC service.
 // All implementations must embed UnimplementedChatGRPCServer
 // for forward compatibility.
 type ChatGRPCServer interface {
 	Query(context.Context, *ChatRequest) (*ChatResponse, error)
 	UploadPdf(grpc.ClientStreamingServer[UploadPdfRequest, UploadPdfResponse]) error
-	UploadFileStramMultiTenant(grpc.ClientStreamingServer[UploadFileStreamRequest, UploadFileStreamResponse]) error
 	mustEmbedUnimplementedChatGRPCServer()
 }
 
@@ -99,9 +83,6 @@ func (UnimplementedChatGRPCServer) Query(context.Context, *ChatRequest) (*ChatRe
 }
 func (UnimplementedChatGRPCServer) UploadPdf(grpc.ClientStreamingServer[UploadPdfRequest, UploadPdfResponse]) error {
 	return status.Error(codes.Unimplemented, "method UploadPdf not implemented")
-}
-func (UnimplementedChatGRPCServer) UploadFileStramMultiTenant(grpc.ClientStreamingServer[UploadFileStreamRequest, UploadFileStreamResponse]) error {
-	return status.Error(codes.Unimplemented, "method UploadFileStramMultiTenant not implemented")
 }
 func (UnimplementedChatGRPCServer) mustEmbedUnimplementedChatGRPCServer() {}
 func (UnimplementedChatGRPCServer) testEmbeddedByValue()                  {}
@@ -149,13 +130,6 @@ func _ChatGRPC_UploadPdf_Handler(srv interface{}, stream grpc.ServerStream) erro
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ChatGRPC_UploadPdfServer = grpc.ClientStreamingServer[UploadPdfRequest, UploadPdfResponse]
 
-func _ChatGRPC_UploadFileStramMultiTenant_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(ChatGRPCServer).UploadFileStramMultiTenant(&grpc.GenericServerStream[UploadFileStreamRequest, UploadFileStreamResponse]{ServerStream: stream})
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type ChatGRPC_UploadFileStramMultiTenantServer = grpc.ClientStreamingServer[UploadFileStreamRequest, UploadFileStreamResponse]
-
 // ChatGRPC_ServiceDesc is the grpc.ServiceDesc for ChatGRPC service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -172,11 +146,6 @@ var ChatGRPC_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "UploadPdf",
 			Handler:       _ChatGRPC_UploadPdf_Handler,
-			ClientStreams: true,
-		},
-		{
-			StreamName:    "UploadFileStramMultiTenant",
-			Handler:       _ChatGRPC_UploadFileStramMultiTenant_Handler,
 			ClientStreams: true,
 		},
 	},

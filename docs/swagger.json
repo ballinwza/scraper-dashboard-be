@@ -195,7 +195,99 @@
                 }
             }
         },
-        "/rag/multi/upload": {
+        "/knowledge-files/delete": {
+            "delete": {
+                "description": "Delete a knowledge file associated with a chatbot and user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Knowledge File"
+                ],
+                "summary": "Delete Knowledge File",
+                "parameters": [
+                    {
+                        "description": "Delete Knowledge File Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DeleteKnowledgeFileReqDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain_ai_estate_rag.DeleteKnowledgeFileResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/knowledge-files/list": {
+            "post": {
+                "description": "Get a paginated list of knowledge files for a chatbot",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Knowledge File"
+                ],
+                "summary": "List Knowledge Files",
+                "parameters": [
+                    {
+                        "description": "Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ListKnowledgeFilesReqDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain_ai_estate_rag.ListKnowledgeFilesResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/knowledge-files/upload": {
             "post": {
                 "description": "Uploads a PDF or Image file using streaming gRPC underneath",
                 "consumes": [
@@ -230,7 +322,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.UploadFileMultiTenantResDTO"
+                            "$ref": "#/definitions/domain_ai_estate_rag.UploadFileMultiTenantResponse"
                         }
                     },
                     "400": {
@@ -241,6 +333,50 @@
                     },
                     "500": {
                         "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/knowledge-files/{id}": {
+            "get": {
+                "description": "Get specific knowledge file details by its ID and User ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Knowledge File"
+                ],
+                "summary": "Get Knowledge File by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "File ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain_ai_estate_rag.GetKnowledgeFileResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/handler.errorResponse"
                         }
@@ -690,7 +826,149 @@
                 }
             }
         },
-        "dto.UploadFileMultiTenantReqDTO": {
+        "domain_ai_estate_rag.Chunk": {
+            "type": "object",
+            "properties": {
+                "chunk_index": {
+                    "type": "integer"
+                },
+                "page_number": {
+                    "type": "integer"
+                },
+                "text_content": {
+                    "type": "string"
+                },
+                "token_count": {
+                    "type": "integer"
+                },
+                "vector_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain_ai_estate_rag.DeleteKnowledgeFileResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "domain_ai_estate_rag.FileStatus": {
+            "type": "integer",
+            "format": "int32",
+            "enum": [
+                0,
+                1,
+                2
+            ],
+            "x-enum-varnames": [
+                "FileStatusPending",
+                "FileStatusCompleted",
+                "FileStatusFailed"
+            ]
+        },
+        "domain_ai_estate_rag.GetKnowledgeFileResponse": {
+            "type": "object",
+            "properties": {
+                "file": {
+                    "$ref": "#/definitions/domain_ai_estate_rag.KnowledgeFile"
+                }
+            }
+        },
+        "domain_ai_estate_rag.KnowledgeFile": {
+            "type": "object",
+            "properties": {
+                "chatbot_id": {
+                    "type": "string"
+                },
+                "chunks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain_ai_estate_rag.Chunk"
+                    }
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "error_message": {
+                    "description": "optional",
+                    "type": "string"
+                },
+                "file_size_bytes": {
+                    "type": "integer"
+                },
+                "file_type": {
+                    "type": "string"
+                },
+                "filename": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/domain_ai_estate_rag.FileStatus"
+                },
+                "text_content": {
+                    "description": "optional",
+                    "type": "string"
+                },
+                "total_chunks": {
+                    "type": "integer"
+                },
+                "total_page": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain_ai_estate_rag.ListKnowledgeFilesResponse": {
+            "type": "object",
+            "properties": {
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain_ai_estate_rag.KnowledgeFile"
+                    }
+                },
+                "total_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "domain_ai_estate_rag.UploadFileMultiTenantResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "file_id": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/domain_ai_estate_rag.FileStatus"
+                },
+                "total_bytes": {
+                    "type": "integer"
+                },
+                "total_chunks": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.DeleteKnowledgeFileReqDTO": {
             "type": "object",
             "required": [
                 "chatbot_id"
@@ -701,23 +979,33 @@
                 }
             }
         },
-        "dto.UploadFileMultiTenantResDTO": {
+        "dto.ListKnowledgeFilesReqDTO": {
             "type": "object",
+            "required": [
+                "chatbot_id"
+            ],
             "properties": {
-                "file_id": {
+                "chatbot_id": {
                     "type": "string"
                 },
-                "message": {
+                "limit": {
+                    "type": "integer",
+                    "default": 10
+                },
+                "offset": {
+                    "type": "integer",
+                    "default": 0
+                }
+            }
+        },
+        "dto.UploadFileMultiTenantReqDTO": {
+            "type": "object",
+            "required": [
+                "chatbot_id"
+            ],
+            "properties": {
+                "chatbot_id": {
                     "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "total_bytes": {
-                    "type": "integer"
-                },
-                "total_chunks": {
-                    "type": "integer"
                 }
             }
         },

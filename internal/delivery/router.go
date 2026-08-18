@@ -18,6 +18,7 @@ func SetupRouter(
 	rentalEstateHandler *handler.RentalEstateHandler,
 	userHandler *handler.UserHandler,
 	ragHandler *handler.RagHandler,
+	knowledgeFileHandler *handler.KnowledgeFileHandler,
 ) *gin.Engine {
 	r := gin.Default()
 
@@ -50,6 +51,17 @@ func SetupRouter(
 			userGroup.GET("/username", userHandler.GetUser)
 		}
 
+		// -- Knowledge File --
+		knowledgeFileGroup := api.Group("/knowledge-files")
+		knowledgeFileGroup.Use(middleware.JWTAuthMiddleware(cfg.JwtAccessSecret))
+		{
+			knowledgeFileGroup.GET("/:id", knowledgeFileHandler.GetKnowledgeFile)
+			knowledgeFileGroup.POST("/list", knowledgeFileHandler.ListKnowledgeFiles)
+			knowledgeFileGroup.DELETE("/delete", knowledgeFileHandler.DeleteKnowledgeFile)
+			knowledgeFileGroup.POST("/upload", knowledgeFileHandler.UploadFileMultiTenant)
+		}
+
+		// -- Scraper --
 		scraperGroup := api.Group("/scraper")
 		scraperGroup.Use(middleware.JWTAuthMiddleware(cfg.JwtAccessSecret))
 		{
@@ -70,7 +82,6 @@ func SetupRouter(
 		{
 			ragGroup.POST("/qna", ragHandler.AskQuestion)
 			ragGroup.POST("/upload", ragHandler.RecieverOfUplodFile)
-			ragGroup.POST("/multi/upload", ragHandler.UploadFileMultiTenant)
 		}
 
 	}

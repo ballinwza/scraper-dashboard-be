@@ -3,13 +3,13 @@ package usecase_rag
 import (
 	"context"
 
-	"github.com/ballinwza/scraper-dashboard-be/internal/domain"
+	domain_ai_estate_rag "github.com/ballinwza/scraper-dashboard-be/internal/domain/ai_estate_rag"
 )
 
-func (u *ragUsecase) ReceiverOfUploadFile(ctx context.Context, fileBytes []byte, filename string) (*domain.UploadPdfResponse, error) {
+func (u *ragUsecase) ReceiverOfUploadFile(ctx context.Context, fileBytes []byte, filename string) (*domain_ai_estate_rag.UploadPdfResponse, error) {
 	res, _ := u.grpc.UploadChunkDocument(ctx, filename, fileBytes)
 
-	result := domain.UploadPdfResponse{
+	result := domain_ai_estate_rag.UploadPdfResponse{
 		FileId:  res.FileId,
 		Success: res.Success,
 		Message: res.Message,

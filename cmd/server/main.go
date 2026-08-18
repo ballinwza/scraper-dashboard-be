@@ -11,9 +11,10 @@ import (
 	http "github.com/ballinwza/scraper-dashboard-be/internal/delivery"
 	"github.com/ballinwza/scraper-dashboard-be/internal/delivery/http/handler"
 	"github.com/ballinwza/scraper-dashboard-be/internal/domain"
-	"github.com/ballinwza/scraper-dashboard-be/internal/repository/external_grpc"
+	"github.com/ballinwza/scraper-dashboard-be/internal/repository/ai_estate_rag_grpc"
 	"github.com/ballinwza/scraper-dashboard-be/internal/repository/mongodb"
 	"github.com/ballinwza/scraper-dashboard-be/internal/repository/scraper"
+	usecase_ai_estate_rag "github.com/ballinwza/scraper-dashboard-be/internal/usecase/ai_estate_rag"
 	usecase_rag "github.com/ballinwza/scraper-dashboard-be/internal/usecase/rag"
 	usecase_rental_estate "github.com/ballinwza/scraper-dashboard-be/internal/usecase/rental_estate"
 	usecase_user "github.com/ballinwza/scraper-dashboard-be/internal/usecase/user"
@@ -66,7 +67,7 @@ func main() {
 	db := client.Database("scraper_dashboard")
 
 	// # GRPC
-	grpcConn, grpcCleanup, err := external_grpc.NewAiEstateRagRepository(cfg.AiEstateRagUri)
+	grpcConn, grpcCleanup, err := ai_estate_rag_grpc.NewAiEstateRagRepository(cfg.AiEstateRagUri)
 	if err != nil {
 		logger.Fatal("Failed to initialize external gRPC", zap.Error(err))
 	}
@@ -81,6 +82,7 @@ func main() {
 	rentalEstateUsecase := usecase_rental_estate.NewScraperRentalEstateUsecase(scraperRealEstateRepo, mongoRealEstateRepo)
 	authUsecase := usecase_user.NewAuthUsecase(mongoUserRepo, cfg)
 	ragUsecase := usecase_rag.NewRagUsecase(grpcConn)
+	aiEstateRagUsecase := usecase_ai_estate_rag.NewAiEstateRagUsecase(grpcConn)
 
 	// Createing index
 	if err := authUsecase.EnsureIndexes(ctx); err != nil {
@@ -92,6 +94,7 @@ func main() {
 	rentalHandler := handler.NewRentalEstateHandler(rentalEstateUsecase)
 	authHandler := handler.NewUserHandler(authUsecase, cfg)
 	ragHandler := handler.NewRagHandler(ragUsecase, cfg)
+	knowledgeFileHandler := handler.NewKnowledgeFileHandler(aiEstateRagUsecase)
 
 	// ==========================================
 	// # Initialize & Start HTTP Router (Main Thread)
@@ -102,6 +105,7 @@ func main() {
 		rentalHandler,
 		authHandler,
 		ragHandler,
+		knowledgeFileHandler,
 	)
 
 	serverAddr := fmt.Sprintf(":%s", cfg.ServerPort)

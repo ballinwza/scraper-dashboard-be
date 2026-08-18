@@ -76,23 +76,11 @@ type KnowledgeFile struct {
 
 // --- Structs สำหรับ Get Knowledge File ---
 
-// type GetKnowledgeFileRequestDTO struct {
-// 	ID     string `uri:"id" json:"id" binding:"required"`
-// 	UserID string `form:"user_id" json:"user_id" binding:"required"`
-// }
-
 type GetKnowledgeFileResponse struct {
 	File KnowledgeFile `json:"file"`
 }
 
 // --- Structs สำหรับ List Knowledge Files ---
-
-// type ListKnowledgeFilesRequestDTO struct {
-// 	UserID    string `form:"user_id" json:"user_id" binding:"required"`
-// 	ChatbotID string `form:"chatbot_id" json:"chatbot_id" binding:"required"`
-// 	Limit     int32  `form:"limit,default=10" json:"limit"`
-// 	Offset    int32  `form:"offset,default=0" json:"offset"`
-// }
 
 type ListKnowledgeFilesResponse struct {
 	Files      []KnowledgeFile `json:"files"`
@@ -100,11 +88,6 @@ type ListKnowledgeFilesResponse struct {
 }
 
 // --- Structs สำหรับ Delete Knowledge File ---
-
-// type DeleteKnowledgeFileRequestDTO struct {
-// 	ChatbotID string `json:"chatbot_id" binding:"required"`
-// 	UserID    string `json:"user_id" binding:"required"`
-// }
 
 type DeleteKnowledgeFileResponse struct {
 	Success bool   `json:"success"`

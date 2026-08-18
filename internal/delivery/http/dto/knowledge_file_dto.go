@@ -24,14 +24,3 @@ type MultiTenantUploadFileReqDTO struct {
 type UploadFileMultiTenantReqDTO struct {
 	ChatbotId string `form:"chatbot_id" json:"chatbot_id" binding:"required"`
 }
-
-// // --- Response DTOs ---
-
-// type UploadFileMultiTenantResDTO struct {
-// 	FileID      string                          `json:"file_id"`
-// 	Status      domain_ai_estate_rag.FileStatus `json:"status"`
-// 	TotalChunks int32                           `json:"total_chunks"`
-// 	TotalBytes  int64                           `json:"total_bytes"`
-// 	Message     string                          `json:"message"`
-// 	CreatedAt   time.Time                       `json:"created_at"`
-// }
